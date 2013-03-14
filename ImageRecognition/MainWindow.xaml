@@ -1,0 +1,46 @@
+﻿<Window x:Class="ImageRecognition.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid Name="GridRoot">
+        <DockPanel >
+            <StackPanel DockPanel.Dock="Left">
+            <TextBlock Text="Total number of trials: "> <Run Text="{Binding TotalNumberOfTrials}"/></TextBlock>
+            <TextBlock Text="Success rate (last 100): "><Run Text="{Binding LastNSuccessRate}" /></TextBlock>
+            <TextBlock Margin="0,0,0,0" Text="Feature Count: "><Run Text="{Binding FeatureCount}"/></TextBlock>
+            <TextBlock Text="Average attractiveness: "><Run Text="{Binding AverageAtractiveness}" /></TextBlock>
+                <TextBlock Text="Max attractiveness: "><Run Text="{Binding MaxAttractiveness}" /></TextBlock>
+            <TextBlock Text="Average intersetingneness: "><Run Text="{Binding AverageInterestingness}" /></TextBlock>
+                <TextBlock Text="Max intersetingneness: "><Run Text="{Binding MaxInterestingness}" /></TextBlock>
+            <TextBlock Text="Average number of points per feature: "><Run Text="{Binding AverageNumberOfPoints}" /></TextBlock>
+            <TextBlock Text="Average number of data seen per feature: "><Run Text="{Binding AverageNumberOfDataSeen}" /></TextBlock>
+            <TextBlock Text="Success over Last 100 trials:"></TextBlock>
+            <ItemsControl Name="db" ItemsSource="{Binding SuccessRatePerLabel}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="8,0,0,0" Text="{Binding Key}" FontWeight="Bold" ></TextBlock>
+                            <TextBlock Margin="20,0,0,0" Text="{Binding Value.LastN2}"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>    
+            <Button DockPanel.Dock="Top" Click="Delete_Click">Delete</Button>
+            <ListBox Name="FeautresList" DockPanel.Dock="Right" SelectionMode="Multiple">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="5">
+                            <TextBlock Text="Index: "><Run Text="{Binding CreationIndex, Mode=OneWay}"/></TextBlock>
+                            <TextBlock Text="Interestingness: "><Run Text="{Binding Interestingness, Mode=OneWay}"/></TextBlock>
+                            <TextBlock Text="Data Seen: "><Run Text="{Binding DataSeen, Mode=OneWay}"/></TextBlock>
+                            <TextBlock Text="Number of points: "><Run Text="{Binding NumberOfPoints, Mode=OneWay}"/></TextBlock>
+                            <TextBlock Text="Is Trained: "><Run Text="{Binding IsTrained, Mode=OneWay}"/></TextBlock>
+                            <TextBlock Text="Attractiveness: "><Run Text="{Binding Attractiveness, Mode=OneWay}"/></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+    </Grid>
+</Window>
