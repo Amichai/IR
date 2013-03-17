@@ -56,8 +56,8 @@ namespace ImageRecognition {
             foreach (var a in dataStream) {
                 var result = features.Test(a.Item1);
                 features.Train(a.Item2);    
-                features.Scan(purge:true);
-                for (int j = 0; j < 15; j++) {
+                features.Scan(purge:false);
+                for (int j = 0; j < 2; j++) {
                     features.Recombine();
                 }
                 if (i++ % 10 == 0) {

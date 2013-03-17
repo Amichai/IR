@@ -23,7 +23,6 @@ namespace ImageRecognition {
                     this.features.Add(
                     new Feature() {
                         Func = new PixelEval(i, j)
-                        //Eval = k => new List<double>() { k[i][j] }
                     });
                 }
             }
@@ -43,17 +42,49 @@ namespace ImageRecognition {
 
         Dictionary<string, double> LastProbabilities { get; set; }
 
+        private double probabilisticWeight(double prob, int count) {
+            int labelCount = LastProbabilities.Count();
+            double eps = 1.0 / (count + 1);
+            double val = ((prob + eps) * labelCount) / ((1.0 - prob) + eps);
+            if (double.IsNaN(val)) throw new Exception();
+            return val;
+        }
+
+        internal Dictionary<string, double> Test2(int[][] p) {
+            Dictionary<string, double> probabilities = new Dictionary<string, double>();
+            foreach (var f in features) {
+                var results = f.Test(p);
+                if (!f.Trained() || results == null) continue;
+                foreach (var r in results) {
+                    if (!probabilities.ContainsKey(r.Key)) {
+                        if (LastProbabilities.Count != 0) {
+                            probabilities[r.Key] = 1.0 / (LastProbabilities.Count);
+                        } else {
+                            probabilities[r.Key] = 1.0;
+                        }
+                    }
+                    double val1 = probabilisticWeight(r.Value, f.DataSeen);
+                    double newVal = probabilities[r.Key] * val1;
+                    if (double.IsNaN(newVal) || double.IsInfinity(newVal)) {
+                        //throw new Exception();
+                    }
+                    probabilities[r.Key] = newVal;
+                }
+            }
+            this.LastProbabilities = probabilities.Normalize();
+            return LastProbabilities;
+        }
+
         internal Dictionary<string,double> Test(int[][] p) {
             Dictionary<string, double> probabilities = new Dictionary<string, double>();
             foreach (var f in features) {
                 var results = f.Test(p);
                 if (!f.Trained() || results == null) continue;
                 foreach (var r in results) {
-                    if (probabilities.ContainsKey(r.Key)) {
-                        probabilities[r.Key] += r.Value;
-                    } else {
-                        probabilities[r.Key] = r.Value;
+                    if (!probabilities.ContainsKey(r.Key)) {
+                        probabilities[r.Key] = 0;
                     }
+                    probabilities[r.Key] += r.Value;
                 }
             }
             this.LastProbabilities = probabilities.Normalize();
@@ -107,8 +138,11 @@ namespace ImageRecognition {
         enum featureAction { recombine, delete };
         Dictionary<int, featureAction> actions;
         List<int> recombine;
+        double purgeThreshold = 1.0;
+        double thresholdIncrementVal = .0000;
 
         public void Scan(bool purge = false) {
+            purgeThreshold += thresholdIncrementVal;
             actions = new Dictionary<int, featureAction>();
             recombine = new List<int>();
             double lastMeanInterestingness = AverageInterestingness();
@@ -134,12 +168,14 @@ namespace ImageRecognition {
                 if (interestingness > MaxInterestingness) {
                     MaxInterestingness = interestingness;
                 }
-
                 ///Deletion:
                 if (
                     features[i].Trained(10)
-                    //&& interestingness < lastMeanInterestingness
-                    && attract < lastMeanAttractiveness * .1
+                    //&& interestingness < purgeThreshold
+                    //&& attract < .01
+                    && attract < lastMeanAttractiveness * purgeThreshold
+                    && interestingness < lastMeanInterestingness * purgeThreshold
+                    //&& attract < lastMeanAttractiveness * .1
                     //&& interestingness < lastMeanInterestingness
                     //&& interestingness < lastMeanInterestingness * .85
                 ) {
@@ -147,8 +183,10 @@ namespace ImageRecognition {
                         this.features.RemoveAt(i);
                         i--;
                     }
-                } else if (attract > lastMeanAttractiveness 
-                    && interestingness > lastMeanInterestingness) {
+                } else if (
+                    attract > lastMeanAttractiveness  
+                     //interestingness > .09
+                    ) {
                     recombine.Add(i);
                 }
             }
@@ -172,7 +210,7 @@ namespace ImageRecognition {
                 var f = features[i];
                 var attract = f.Interestingness;
                 if (attract == double.MinValue || double.IsNaN(attract)) continue;
-                if (attract < .1 && f.SuccessRate.Overall.Count > 50) {
+                if (attract < .1 && f.SuccessRate.Overall.Count() > 50) {
                     toDelete.Add(i);
                 } else {
                     attrc[f] = attract;
@@ -189,7 +227,8 @@ namespace ImageRecognition {
             var l2 = sorted.ElementAt(1).Key.Func.GetPoints();
             points.AddRange(combineNoDuplicates(l1, l2, 28));
             this.features.Add(new Feature() {
-                Func = new PixelSubset(points)
+                //Func = new PixelSubset(points)
+                Func = new PixelDiff(points)
             });
         }
 
@@ -249,13 +288,33 @@ namespace ImageRecognition {
             int idx2 = recombine[rand.Next(count - 1)];
             var f1 = features[idx1];
             var f2 = features[idx2];
-            var l1 = f1.Func.GetPoints();
-            var l2 = f2.Func.GetPoints();
-            List<IntPoint> points = new List<IntPoint>();
-            points.AddRange(combineNoDuplicates(l1, l2, 28));
+            var l1 = f1.Func.GetPoint().Take(1).ToList();
+            var l2 = f2.Func.GetPoint().Take(1).ToList();
+            //List<IntPoint> points = new List<IntPoint>();
+            //points.AddRange(combineNoDuplicates(l1, l2, 28));
+            var newFeature = new Feature() {
+                //Func = new PixelQuot(points)
+                Func = new PixelDiff(l1) { Ref = f2.Func }
+                //Func = new PixelSubset(points)
+            };
+            //Debug.Print(newFeature.Func.GetPoints().Count().ToString());
+            this.features.Add(newFeature);
+
+
             this.features.Add(new Feature() {
-                Func = new PixelSubset(points)
+                //Func = new PixelQuot(points)
+                Func = new PixelSum(l2) { Ref = f1.Func }
+                //Func = new PixelSubset(points)
             });
+            //this.features.Add(new Feature() {
+            //    Func = new PixelSubset(points)
+            //    //Func = new PixelMult(points)
+            //});
+
+            //this.features.Add(new Feature() {
+            //    Func = new PixelQuot(points)
+            //    //Func = new PixelMult(points)
+            //});
 
             //delete(toDelete);
             //generate ten new features where each feature is composed of two sub features with
