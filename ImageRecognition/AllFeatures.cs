@@ -40,7 +40,7 @@ namespace ImageRecognition {
 
         private List<Feature> features;
 
-        Dictionary<string, double> LastProbabilities { get; set; }
+        public Dictionary<string, double> LastProbabilities { get; set; }
 
         private double probabilisticWeight(double prob, int count) {
             int labelCount = LastProbabilities.Count();
@@ -91,11 +91,33 @@ namespace ImageRecognition {
             return LastProbabilities;
         }
 
-        internal void Train(string p) {
+        internal Dictionary<string, double> Test3(int[][] p) {
+            Dictionary<string, int> probabilities = new Dictionary<string, int>();
+            foreach (var f in features) {
+                var results = f.Test(p);
+                if (!f.Trained() || results == null) continue;
+                string guess = results.MaxLabel();
+                    if (!probabilities.ContainsKey(guess)) {
+                        probabilities[guess] = 0;
+                    }
+                    probabilities[guess]++;
+            }
+            this.LastProbabilities = probabilities.Normalize();
+            return LastProbabilities;
+        }
+
+        public void Train(string p, int[][] input) {
+            foreach (var f in features) {
+                f.Train(p, input);
+            }
+            Success.Trial(p, null);
+        }
+
+        internal void Train(string p, Dictionary<string, double> lastProb = null) {
             foreach (var f in features) {
                 f.Train(p);
             }
-            Success.Trial(p, this.LastProbabilities);
+            Success.Trial(p, lastProb);
         }
 
         private void delete(List<int> indicies) {
@@ -185,6 +207,8 @@ namespace ImageRecognition {
                     }
                 } else if (
                     attract > lastMeanAttractiveness  
+                    && interestingness > lastMeanInterestingness
+                    //attract > MaxAttractiveness * .9
                      //interestingness > .09
                     ) {
                     recombine.Add(i);
@@ -279,7 +303,26 @@ namespace ImageRecognition {
 
         private static Random rand = new Random();
 
-
+        /// <summary>
+        /// Doesn't require the scan function to work   
+        /// </summary>
+        internal void Recombine2() {
+            int count = features.Count();
+            if (count == 0) return;
+            int idx1 = rand.Next(count - 1);
+            int idx2 = rand.Next(count - 1);
+            var f1 = features[idx1];
+            var f2 = features[idx2];
+            var l1 = f1.Func.GetPoint().Take(1).ToList();
+            var l2 = f2.Func.GetPoint().Take(1).ToList();
+            var newFeature = new Feature() {
+                Func = new PixelDiff(l1) { Ref = f2.Func }
+            };
+            this.features.Add(newFeature);
+            this.features.Add(new Feature() {
+                Func = new PixelSum(l2) { Ref = f1.Func }
+            });
+        }
 
         internal void Recombine() {
             int count = recombine.Count();
@@ -290,35 +333,18 @@ namespace ImageRecognition {
             var f2 = features[idx2];
             var l1 = f1.Func.GetPoint().Take(1).ToList();
             var l2 = f2.Func.GetPoint().Take(1).ToList();
-            //List<IntPoint> points = new List<IntPoint>();
-            //points.AddRange(combineNoDuplicates(l1, l2, 28));
-            var newFeature = new Feature() {
-                //Func = new PixelQuot(points)
-                Func = new PixelDiff(l1) { Ref = f2.Func }
-                //Func = new PixelSubset(points)
-            };
-            //Debug.Print(newFeature.Func.GetPoints().Count().ToString());
-            this.features.Add(newFeature);
-
-
             this.features.Add(new Feature() {
-                //Func = new PixelQuot(points)
-                Func = new PixelSum(l2) { Ref = f1.Func }
-                //Func = new PixelSubset(points)
+                //Func = new PixelProjection(l2) { Ref = f1.Func, Ref2 = f2.Func }
+                Func = new PixelDiff(l2) { Ref = f1.Func }
             });
-            //this.features.Add(new Feature() {
-            //    Func = new PixelSubset(points)
-            //    //Func = new PixelMult(points)
-            //});
 
+            //var newFeature = new Feature() {
+            //    Func = new PixelDiff(l1) { Ref = f2.Func }
+            //};
+            //this.features.Add(newFeature);
             //this.features.Add(new Feature() {
-            //    Func = new PixelQuot(points)
-            //    //Func = new PixelMult(points)
+            //    Func = new PixelSum(l2) { Ref = f1.Func }
             //});
-
-            //delete(toDelete);
-            //generate ten new features where each feature is composed of two sub features with
-            //better than average attractiveness (past success) and are trained
         }
 
         public double MaxInterestingness { get; set; }
