@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MyLogger;
 
 namespace ImageRecognition {
     /// <summary>
@@ -22,6 +23,7 @@ namespace ImageRecognition {
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged {
         public MainWindow() {
+            Logger.Inst.Deserialize(@"..\..\..\Logger\TrialParams.xml");
             InitializeComponent();
             bw = new BackgroundWorker();
             bw.DoWork += bw_DoWork;
@@ -46,6 +48,11 @@ namespace ImageRecognition {
         BackgroundWorker bw;
 
         void workbench_FeaturesTrained(object sender, FeaturesTrainedEventArgs e) {
+
+            Logger.Inst.SetResult(e.TotalNumberOfTrials, e.LastNSuccessRate, e.FeatureCount,
+                e.AverageAttractiveness, e.AverageInterestingness, e.AverageNumberOfPoints, e.AverageNumberOfDataSeen,
+                e.MaxAttractiveness, e.MaxInterestingness);
+
             this.TotalNumberOfTrials = e.TotalNumberOfTrials;
             this.LastNSuccessRate = e.LastNSuccessRate;
             this.SuccessRatePerLabel = e.SuccessRatePerLabel;
@@ -60,17 +67,6 @@ namespace ImageRecognition {
             this.MaxAttractiveness = e.MaxAttractiveness;
 
             this.Features = e.Features;
-
-            lock (toDelete) {
-                if (toDelete.Count() > 0) {
-                    workbench.Purge(toDelete);
-                    toDelete.Clear();
-                    Dispatcher.Invoke((Action)(() => {
-                        this.FeautresList.ItemsSource = null;
-                        this.FeautresList.ItemsSource = this.Features;
-                    }));
-                }
-            }
         }
 
         void workbench_InputLoaded(object sender, TrainingDataEventArgs e) {
@@ -231,17 +227,5 @@ namespace ImageRecognition {
         }
         private List<Feature> _Features;
         public const string FeaturesPropertyName = "Features";
-
-        public List<int> toDelete = new List<int>();
-
-        private void Delete_Click(object sender, RoutedEventArgs e) {
-            lock (toDelete) {
-                foreach(var item in this.FeautresList.SelectedItems){
-                    var index = this.Features.IndexOf((Feature)item);
-                    if (index == -1) continue;
-                    toDelete.Add(index);
-                }
-            }
-        }
     }
 }

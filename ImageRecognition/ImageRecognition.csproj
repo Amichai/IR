@@ -102,6 +102,10 @@
       <Project>{32177e04-842c-461a-acb9-61d00e7a06cf}</Project>
       <Name>PRCommon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Logger\MyLogger.csproj">
+      <Project>{0ff2fc2b-3ce8-4d68-8646-0f921c6af141}</Project>
+      <Name>MyLogger</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

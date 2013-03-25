@@ -26,21 +26,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>    
-            <Button DockPanel.Dock="Top" Click="Delete_Click">Delete</Button>
-            <ListBox Name="FeautresList" DockPanel.Dock="Right" SelectionMode="Multiple">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="5">
-                            <TextBlock Text="Index: "><Run Text="{Binding CreationIndex, Mode=OneWay}"/></TextBlock>
-                            <TextBlock Text="Interestingness: "><Run Text="{Binding Interestingness, Mode=OneWay}"/></TextBlock>
-                            <TextBlock Text="Data Seen: "><Run Text="{Binding DataSeen, Mode=OneWay}"/></TextBlock>
-                            <TextBlock Text="Number of points: "><Run Text="{Binding NumberOfPoints, Mode=OneWay}"/></TextBlock>
-                            <TextBlock Text="Is Trained: "><Run Text="{Binding IsTrained, Mode=OneWay}"/></TextBlock>
-                            <TextBlock Text="Attractiveness: "><Run Text="{Binding Attractiveness, Mode=OneWay}"/></TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
         </DockPanel>
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using PRCommon;
+﻿using MyLogger;
+using PRCommon;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,7 +58,8 @@ namespace ImageRecognition {
                 var result = features.Test(a.Item1);
                 features.Train(a.Item2, result);    
                 features.Scan(purge:false);
-                for (int j = 0; j < 2; j++) {
+                
+                for (int j = 0; j < Logger.Inst.Get("FeaturesToRecombine"); j++) {
                     features.Recombine();
                 }
                 if (i++ % 10 == 0) {

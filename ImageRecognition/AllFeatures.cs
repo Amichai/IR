@@ -22,7 +22,7 @@ namespace ImageRecognition {
                 for (int j = 0; j < height; j++) {
                     this.features.Add(
                     new Feature() {
-                        Func = new PixelEval(i, j)
+                        Projection = new PixelEval(i, j)
                     });
                 }
             }
@@ -238,7 +238,7 @@ namespace ImageRecognition {
                     toDelete.Add(i);
                 } else {
                     attrc[f] = attract;
-                    numberOfPixels += f.Func.GetPoints().Count();
+                    numberOfPixels += f.Projection.GetPoints().Count();
                 }
             }
             delete(toDelete);
@@ -247,12 +247,12 @@ namespace ImageRecognition {
             var sorted = attrc.OrderByDescending(i => i.Value);
             List<IntPoint> points = new List<IntPoint>();
             if (sorted.Count() < 5) return;
-            var l1 = sorted.ElementAt(0).Key.Func.GetPoints();
-            var l2 = sorted.ElementAt(1).Key.Func.GetPoints();
+            var l1 = sorted.ElementAt(0).Key.Projection.GetPoints();
+            var l2 = sorted.ElementAt(1).Key.Projection.GetPoints();
             points.AddRange(combineNoDuplicates(l1, l2, 28));
             this.features.Add(new Feature() {
                 //Func = new PixelSubset(points)
-                Func = new PixelDiff(points)
+                Projection = new PixelDiff(points)
             });
         }
 
@@ -313,14 +313,18 @@ namespace ImageRecognition {
             int idx2 = rand.Next(count - 1);
             var f1 = features[idx1];
             var f2 = features[idx2];
-            var l1 = f1.Func.GetPoint().Take(1).ToList();
-            var l2 = f2.Func.GetPoint().Take(1).ToList();
-            var newFeature = new Feature() {
-                Func = new PixelDiff(l1) { Ref = f2.Func }
-            };
-            this.features.Add(newFeature);
+            var l1 = f1.Projection.GetPoint().Take(1).ToList();
+            var l2 = f2.Projection.GetPoint().Take(1).ToList();
+            //var newFeature = new Feature() {
+            //    Func = new PixelDiff(l1) { Ref = f2.Func }
+            //};
+            //this.features.Add(newFeature);
+            //this.features.Add(new Feature() {
+            //    Func = new PixelSum(l2) { Ref = f1.Func }
+            //});
             this.features.Add(new Feature() {
-                Func = new PixelSum(l2) { Ref = f1.Func }
+                //Func = new PixelProjection(l2) { Ref = f1.Func, Ref2 = f2.Func }
+                Projection = new PixelDiff(l2) { Ref = f1.Projection }
             });
         }
 
@@ -331,11 +335,11 @@ namespace ImageRecognition {
             int idx2 = recombine[rand.Next(count - 1)];
             var f1 = features[idx1];
             var f2 = features[idx2];
-            var l1 = f1.Func.GetPoint().Take(1).ToList();
-            var l2 = f2.Func.GetPoint().Take(1).ToList();
+            var l1 = f1.Projection.GetPoint().Take(1).ToList();
+            var l2 = f2.Projection.GetPoint().Take(1).ToList();
             this.features.Add(new Feature() {
                 //Func = new PixelProjection(l2) { Ref = f1.Func, Ref2 = f2.Func }
-                Func = new PixelDiff(l2) { Ref = f1.Func }
+                Projection = new PixelDiff(l2) { Ref = f1.Projection }
             });
 
             //var newFeature = new Feature() {
