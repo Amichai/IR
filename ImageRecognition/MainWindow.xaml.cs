@@ -34,6 +34,8 @@ namespace ImageRecognition {
             this.GridRoot.DataContext = this;
             //workbench.InputLoaded += workbench_InputLoaded;
             workbench.FeaturesTrained += workbench_FeaturesTrained;
+            this.TrialParams.Text = Logger.Inst.SerializeParams().ToString();
+            this.OutputFile.Text = "Output Filepath: " + Logger.Inst.OutputFilePath();
             bw.RunWorkerAsync();
             //this.FeautresList.ItemsSource = this.Features;
         }
@@ -67,10 +69,6 @@ namespace ImageRecognition {
             this.MaxAttractiveness = e.MaxAttractiveness;
 
             this.Features = e.Features;
-        }
-
-        void workbench_InputLoaded(object sender, TrainingDataEventArgs e) {
-            //Debug.Print("New input loaded");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

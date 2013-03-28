@@ -1,4 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <params>
-  <FeaturesToRecombine IsIntVal="true" Detail="" Value="2" />
+  <FeaturesToRecombine Value="1" />
+  <FeatureType Value="PixelDiff" />
+  <EvaluateFeatureCount Value="true" />
+  <UseBoosterFeature Value="true" />
 </params>

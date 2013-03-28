@@ -7,21 +7,17 @@ using System.Xml.Linq;
 
 namespace MyLogger {
     struct LogParam {
-        public double Val;
-        public string Detail;
-        public bool IsIntVal;
+        public string Value { get; set; }
+        public string Detail { get; set; }
 
         public static LogParam FromXml(XElement xml) {
-            LogParam newparam = new LogParam();
+            LogParam newparam = new LogParam() { Detail = "" };
             foreach (var a in xml.Attributes()) {
-                if (a.Name.ToString() == "IsIntVal") {
-                    newparam.IsIntVal = bool.Parse(a.Value);
+                if (a.Name.ToString() == "Value") {
+                    newparam.Value = a.Value;
                 }
                 if (a.Name.ToString() == "Detail") {
                     newparam.Detail = a.Value;
-                }
-                if (a.Name.ToString() == "Value") {
-                    newparam.Val = double.Parse(a.Value);
                 }
             }
             return newparam;

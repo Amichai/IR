@@ -5,12 +5,85 @@ using System.Text;
 using System.Threading.Tasks;
 using PRCommon;
 using System.Diagnostics;
+using MyLogger;
 
 namespace ImageRecognition {
     public class AllFeatures {
         public AllFeatures() {
             this.features = new List<Feature>();
-            Success = new FeatureSuccess();
+            this.Success = new FeatureSuccess();
+            featureType = Logger.Inst.GetString("FeatureType");
+            featureType2 = Logger.Inst.GetString("FeatureType2");
+        }
+
+        private string featureType = null;
+        private string featureType2 = null;
+
+        private void addFeature(string fType, int idx1 ,int idx2) {
+            if (fType == null) {
+                return;
+            }
+            var f1 = features[idx1];
+            var f2 = features[idx2];
+            var l1 = f1.Projection.GetPoint();
+            var l2 = f2.Projection.GetPoint();
+            Feature newFeature;
+            switch (fType) {
+                case "PixelProjection":
+                    newFeature = new Feature() {
+                        Projection = new PixelProjection(new List<IntPoint>() { l2.Value }) { Ref = f1.Projection, Ref2 = f2.Projection }
+                    };
+                    break;
+                case "PixelDiff":
+                    newFeature = new Feature() {
+                        Projection = new PixelDiff(l2.Value, f1.Projection)
+                    };
+                    break;
+                case "SymmetricalPixelDiff":
+                    newFeature = new Feature() {
+                        Projection = new SymmetricalPixelDiff() { Ref = f1.Projection, Ref2 = f2.Projection }
+                    };
+                    break;
+                case "PixelSum":
+                    newFeature = new Feature() {
+                        Projection = new PixelSum(l2.Value) { Ref = f1.Projection }
+                    };
+                    break;
+                case "PixelQuot":
+                    newFeature = new Feature() {
+                        Projection = new PixelQuot(l2.Value, f1.Projection)
+                    };
+                    break;
+                case "PixelProd":
+                    newFeature = new Feature() {
+                        Projection = new PixelProd(l2.Value) { Ref = f1.Projection }
+                    };
+                    break;
+                default:
+                    throw new Exception("unknown feature type");
+            }
+
+            features.Add(newFeature);
+        }
+
+        internal void Recombine() {
+            int count = recombine.Count();
+            if (count == 0) return;
+            int idx1 = recombine[rand.Next(count - 1)];
+            int idx2 = recombine[rand.Next(count - 1)];
+            addFeature(featureType, idx1, idx2);
+            idx1 = recombine[rand.Next(count - 1)];
+            idx2 = recombine[rand.Next(count - 1)];
+            addFeature(featureType2, idx1, idx2);
+            
+
+            //var newFeature = new Feature() {
+            //    Func = new PixelDiff(l1) { Ref = f2.Func }
+            //};
+            //this.features.Add(newFeature);
+            //this.features.Add(new Feature() {
+            //    Func = new PixelSum(l2) { Ref = f1.Func }
+            //});
         }
 
         public List<Feature> Get() {
@@ -45,28 +118,26 @@ namespace ImageRecognition {
         private double probabilisticWeight(double prob, int count) {
             int labelCount = LastProbabilities.Count();
             double eps = 1.0 / (count + 1);
-            double val = ((prob + eps) * labelCount) / ((1.0 - prob) + eps);
-            if (double.IsNaN(val)) throw new Exception();
+            double val = ((prob + eps) * (labelCount + 1)) / ((1.0 - prob) + eps);
+            //double val2 = Math.Log(val);
+            if (double.IsNaN(val) || double.IsInfinity(val)) throw new Exception();
+            //if (double.IsNaN(val2) || double.IsInfinity(val2)) throw new Exception();
             return val;
         }
 
-        internal Dictionary<string, double> Test2(int[][] p) {
+        internal Dictionary<string, double> Test_scaleProbabilitiesToInfinity(int[][] p) {
             Dictionary<string, double> probabilities = new Dictionary<string, double>();
             foreach (var f in features) {
                 var results = f.Test(p);
                 if (!f.Trained() || results == null) continue;
                 foreach (var r in results) {
                     if (!probabilities.ContainsKey(r.Key)) {
-                        if (LastProbabilities.Count != 0) {
-                            probabilities[r.Key] = 1.0 / (LastProbabilities.Count);
-                        } else {
-                            probabilities[r.Key] = 1.0;
-                        }
+                        probabilities[r.Key] = 0;
                     }
-                    double val1 = probabilisticWeight(r.Value, f.DataSeen);
-                    double newVal = probabilities[r.Key] * val1;
+                    double val1 = probabilisticWeight(f.SuccessRate.LabelSuccess[r.Key].LastN(), 10);
+                    double newVal = probabilities[r.Key] += r.Value * val1;
                     if (double.IsNaN(newVal) || double.IsInfinity(newVal)) {
-                        //throw new Exception();
+                        throw new Exception();
                     }
                     probabilities[r.Key] = newVal;
                 }
@@ -110,14 +181,15 @@ namespace ImageRecognition {
             foreach (var f in features) {
                 f.Train(p, input);
             }
-            Success.Trial(p, null);
+            Success.Trial(p, null, null);
         }
 
         internal void Train(string p, Dictionary<string, double> lastProb = null) {
             foreach (var f in features) {
                 f.Train(p);
             }
-            Success.Trial(p, lastProb);
+            
+            Success.Trial(p, lastProb, lastProb.BestGuess());
         }
 
         private void delete(List<int> indicies) {
@@ -145,7 +217,11 @@ namespace ImageRecognition {
         }
 
         public double AverageNumberOfPoints() {
-            return features.Select(i => (double)i.NumberOfPoints).Average();
+            if (Logger.Inst.GetBool("EvaluateFeatureCount")) {
+                return features.Select(i => (double)i.NumberOfPoints).Average();
+            } else {
+                return 1;
+            }
         }
 
         public double AverageNumberOfDataSeen() {
@@ -153,7 +229,6 @@ namespace ImageRecognition {
         }
         List<double> interestingnessVals { get; set; }
         List<double> attractivenessVals { get; set; }
-        List<int> pixels { get; set; }
         List<int> dataSeen { get; set; }
         public int UsefulFeautres { get; set; }
 
@@ -172,7 +247,6 @@ namespace ImageRecognition {
             UsefulFeautres = 0;
             interestingnessVals = new List<double>();
             attractivenessVals = new List<double>();
-            pixels = new List<int>();
             dataSeen = new List<int>();
             for (int i = 0; i < features.Count(); i++) {
                 if (!features[i].Trained()) continue;
@@ -181,7 +255,6 @@ namespace ImageRecognition {
                 UsefulFeautres++;
                 var interestingness = features[i].Interestingness;
                 interestingnessVals.Add(interestingness);
-                pixels.Add(features[i].NumberOfPoints);
                 dataSeen.Add(features[i].DataSeen);
 
                 if (attract > MaxAttractiveness) {
@@ -252,7 +325,7 @@ namespace ImageRecognition {
             points.AddRange(combineNoDuplicates(l1, l2, 28));
             this.features.Add(new Feature() {
                 //Func = new PixelSubset(points)
-                Projection = new PixelDiff(points)
+                //Projection = new PixelDiff(points)
             });
         }
 
@@ -313,8 +386,8 @@ namespace ImageRecognition {
             int idx2 = rand.Next(count - 1);
             var f1 = features[idx1];
             var f2 = features[idx2];
-            var l1 = f1.Projection.GetPoint().Take(1).ToList();
-            var l2 = f2.Projection.GetPoint().Take(1).ToList();
+            var l1 = f1.Projection.GetPoint();
+            var l2 = f2.Projection.GetPoint();
             //var newFeature = new Feature() {
             //    Func = new PixelDiff(l1) { Ref = f2.Func }
             //};
@@ -324,31 +397,8 @@ namespace ImageRecognition {
             //});
             this.features.Add(new Feature() {
                 //Func = new PixelProjection(l2) { Ref = f1.Func, Ref2 = f2.Func }
-                Projection = new PixelDiff(l2) { Ref = f1.Projection }
+                //Projection = new PixelDiff(l2) { Ref = f1.Projection }
             });
-        }
-
-        internal void Recombine() {
-            int count = recombine.Count();
-            if (count == 0) return;
-            int idx1 = recombine[rand.Next(count - 1)];
-            int idx2 = recombine[rand.Next(count - 1)];
-            var f1 = features[idx1];
-            var f2 = features[idx2];
-            var l1 = f1.Projection.GetPoint().Take(1).ToList();
-            var l2 = f2.Projection.GetPoint().Take(1).ToList();
-            this.features.Add(new Feature() {
-                //Func = new PixelProjection(l2) { Ref = f1.Func, Ref2 = f2.Func }
-                Projection = new PixelDiff(l2) { Ref = f1.Projection }
-            });
-
-            //var newFeature = new Feature() {
-            //    Func = new PixelDiff(l1) { Ref = f2.Func }
-            //};
-            //this.features.Add(newFeature);
-            //this.features.Add(new Feature() {
-            //    Func = new PixelSum(l2) { Ref = f1.Func }
-            //});
         }
 
         public double MaxInterestingness { get; set; }

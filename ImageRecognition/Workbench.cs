@@ -12,7 +12,10 @@ namespace ImageRecognition {
         public Workbench() {
             features = new AllFeatures();
             features.GeneratePixelFeatures(28, 28);
+            this.testMethodology = Logger.Inst.GetString("TestMethod");
         }
+
+        string testMethodology = null;
 
         public event EventHandler<TrainingDataEventArgs> InputLoaded;
         public event EventHandler<FeaturesTrainedEventArgs> FeaturesTrained;
@@ -55,11 +58,18 @@ namespace ImageRecognition {
         public void Process(IEnumerable<Tuple<int[][], string>> dataStream) {
             int i = 0;
             foreach (var a in dataStream) {
-                var result = features.Test(a.Item1);
+
+                Dictionary<string, double> result;
+                if (testMethodology == "Test_scaleProbabilitiesToInfinity") {
+                    result = features.Test_scaleProbabilitiesToInfinity(a.Item1);
+                } else {
+                    result = features.Test(a.Item1);
+
+                }
                 features.Train(a.Item2, result);    
                 features.Scan(purge:false);
                 
-                for (int j = 0; j < Logger.Inst.Get("FeaturesToRecombine"); j++) {
+                for (int j = 0; j < Logger.Inst.GetIntVal("FeaturesToRecombine"); j++) {
                     features.Recombine();
                 }
                 if (i++ % 10 == 0) {

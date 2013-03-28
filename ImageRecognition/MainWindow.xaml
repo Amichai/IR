@@ -1,12 +1,16 @@
 ﻿<Window x:Class="ImageRecognition.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="568" Width="376">
     <Grid Name="GridRoot">
         <DockPanel >
             <StackPanel DockPanel.Dock="Left">
+                <Border BorderBrush="Black" BorderThickness="5" Margin="10">
+                <TextBlock Name="TrialParams"></TextBlock>
+                </Border>
+            <TextBlock Name="OutputFile"></TextBlock>
             <TextBlock Text="Total number of trials: "> <Run Text="{Binding TotalNumberOfTrials}"/></TextBlock>
-            <TextBlock Text="Success rate (last 100): "><Run Text="{Binding LastNSuccessRate}" /></TextBlock>
+            <TextBlock FontSize="20" Text="Success rate (last 100): "><Run Text="{Binding LastNSuccessRate}" /></TextBlock>
             <TextBlock Margin="0,0,0,0" Text="Feature Count: "><Run Text="{Binding FeatureCount}"/></TextBlock>
             <TextBlock Text="Average attractiveness: "><Run Text="{Binding AverageAtractiveness}" /></TextBlock>
                 <TextBlock Text="Max attractiveness: "><Run Text="{Binding MaxAttractiveness}" /></TextBlock>
