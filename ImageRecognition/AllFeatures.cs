@@ -14,10 +14,16 @@ namespace ImageRecognition {
             this.Success = new FeatureSuccess();
             featureType = Logger.Inst.GetString("FeatureType");
             featureType2 = Logger.Inst.GetString("FeatureType2");
+            this.attractivenessPurgeThreshold = Logger.Inst.GetDouble("attractivenessPurgeThreshold");
+            this.interestingnessPurgeThreshold = Logger.Inst.GetDouble("interestingnessPurgeThreshold");
+            this.usePixelFeatures = Logger.Inst.GetBool("usePixelFeatures");
         }
 
         private string featureType = null;
         private string featureType2 = null;
+        private double? attractivenessPurgeThreshold;
+        private double? interestingnessPurgeThreshold;
+
 
         private void addFeature(string fType, int idx1 ,int idx2) {
             if (fType == null) {
@@ -31,32 +37,54 @@ namespace ImageRecognition {
             switch (fType) {
                 case "PixelProjection":
                     newFeature = new Feature() {
-                        Projection = new PixelProjection(new List<IntPoint>() { l2.Value }) { Ref = f1.Projection, Ref2 = f2.Projection }
+                        Projection = new PixelProjection(new List<IntPoint>() { l2.Value }) { 
+                            Ref = f1.Projection, Ref2 = f2.Projection,
+                        },
+                        FeatureType = Feature.FType.PixelProjection
                     };
                     break;
                 case "PixelDiff":
+                    if (f1.FeatureType != Feature.FType.PixelEval) return;
                     newFeature = new Feature() {
-                        Projection = new PixelDiff(l2.Value, f1.Projection)
+                        Projection = new PixelDiff(l2.Value, f1.Projection),
+                        FeatureType = Feature.FType.PixelDiff
                     };
                     break;
                 case "SymmetricalPixelDiff":
                     newFeature = new Feature() {
-                        Projection = new SymmetricalPixelDiff() { Ref = f1.Projection, Ref2 = f2.Projection }
+                        Projection = new SymmetricalPixelDiff() { Ref = f1.Projection, Ref2 = f2.Projection },
+                        FeatureType = Feature.FType.SymmetricalPixelDiff
                     };
                     break;
                 case "PixelSum":
                     newFeature = new Feature() {
-                        Projection = new PixelSum(l2.Value) { Ref = f1.Projection }
+                        Projection = new PixelSum(l2.Value) { Ref = f1.Projection },
+                        FeatureType = Feature.FType.PixelSum
                     };
                     break;
                 case "PixelQuot":
+                    if (f1.FeatureType != Feature.FType.PixelEval) return;
                     newFeature = new Feature() {
-                        Projection = new PixelQuot(l2.Value, f1.Projection)
+                        Projection = new PixelQuot(l2.Value, f1.Projection),
+                        FeatureType = Feature.FType.PixelQuot
+                    };
+                    break;
+                case "SymmetricalPixelQuot":
+                    newFeature = new Feature() {
+                        Projection = new SymmetricalPixelQuot() {  Ref = f1.Projection, Ref2 = f2.Projection },
+                        FeatureType =  Feature.FType.SymmetricalPixelQuot
                     };
                     break;
                 case "PixelProd":
                     newFeature = new Feature() {
-                        Projection = new PixelProd(l2.Value) { Ref = f1.Projection }
+                        Projection = new PixelProd(l2.Value) { Ref = f1.Projection },
+                        FeatureType = Feature.FType.PixelProd
+                    };
+                    break;
+                case "SymmetricalPixelSum":
+                    newFeature = new Feature() {
+                        Projection = new SymmetricalPixelSum() { Ref = f1.Projection, Ref2 = f2.Projection },
+                        FeatureType = Feature.FType.SymmetricalPixelSum
                     };
                     break;
                 default:
@@ -95,7 +123,8 @@ namespace ImageRecognition {
                 for (int j = 0; j < height; j++) {
                     this.features.Add(
                     new Feature() {
-                        Projection = new PixelEval(i, j)
+                        Projection = new PixelEval(i, j),
+                        FeatureType = Feature.FType.PixelEval
                     });
                 }
             }
@@ -142,15 +171,18 @@ namespace ImageRecognition {
                     probabilities[r.Key] = newVal;
                 }
             }
-            this.LastProbabilities = probabilities.Normalize();
+            this.LastProbabilities = probabilities.Normalize(totalVal: null);
             return LastProbabilities;
         }
+
+        private bool? usePixelFeatures = null;
 
         internal Dictionary<string,double> Test(int[][] p) {
             Dictionary<string, double> probabilities = new Dictionary<string, double>();
             foreach (var f in features) {
                 var results = f.Test(p);
                 if (!f.Trained() || results == null) continue;
+                if (f.CreationIndex <= 785 && !usePixelFeatures.Value) continue;
                 foreach (var r in results) {
                     if (!probabilities.ContainsKey(r.Key)) {
                         probabilities[r.Key] = 0;
@@ -158,7 +190,7 @@ namespace ImageRecognition {
                     probabilities[r.Key] += r.Value;
                 }
             }
-            this.LastProbabilities = probabilities.Normalize();
+            this.LastProbabilities = probabilities.Normalize(totalVal:null);
             return LastProbabilities;
         }
 
@@ -177,16 +209,9 @@ namespace ImageRecognition {
             return LastProbabilities;
         }
 
-        public void Train(string p, int[][] input) {
+        internal void Train(string p, Dictionary<string, double> lastProb = null, int[][] input = null) {
             foreach (var f in features) {
-                f.Train(p, input);
-            }
-            Success.Trial(p, null, null);
-        }
-
-        internal void Train(string p, Dictionary<string, double> lastProb = null) {
-            foreach (var f in features) {
-                f.Train(p);
+                f.Train(p,input);
             }
             
             Success.Trial(p, lastProb, lastProb.BestGuess());
@@ -268,8 +293,8 @@ namespace ImageRecognition {
                     features[i].Trained(10)
                     //&& interestingness < purgeThreshold
                     //&& attract < .01
-                    && attract < lastMeanAttractiveness * purgeThreshold
-                    && interestingness < lastMeanInterestingness * purgeThreshold
+                    && attract < lastMeanAttractiveness * attractivenessPurgeThreshold
+                    && interestingness < lastMeanInterestingness * interestingnessPurgeThreshold
                     //&& attract < lastMeanAttractiveness * .1
                     //&& interestingness < lastMeanInterestingness
                     //&& interestingness < lastMeanInterestingness * .85

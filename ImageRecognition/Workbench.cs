@@ -13,6 +13,7 @@ namespace ImageRecognition {
             features = new AllFeatures();
             features.GeneratePixelFeatures(28, 28);
             this.testMethodology = Logger.Inst.GetString("TestMethod");
+            this.purge = Logger.Inst.GetBool("purge");
         }
 
         string testMethodology = null;
@@ -43,7 +44,9 @@ namespace ImageRecognition {
                         TrainedFeatures = features.UsefulFeautres,
                         MaxAttractiveness = features.MaxAttractiveness,
                         MaxInterestingness = features.MaxInterestingness,
-                        Features = features.Get()
+                        Features = features.Get(),
+                        MaxSuccessRate = features.Success.Overall.Max,
+                        Monoticity = features.Success.Overall.Monoticity
                     });
             }
         }
@@ -53,7 +56,9 @@ namespace ImageRecognition {
         public void Purge(List<int> features) {
             this.features.Purge(features);
         }
-        
+
+        private bool purge;
+
         //Define a bunch of events so that the parent class can observe everything that happens here
         public void Process(IEnumerable<Tuple<int[][], string>> dataStream) {
             int i = 0;
@@ -64,10 +69,9 @@ namespace ImageRecognition {
                     result = features.Test_scaleProbabilitiesToInfinity(a.Item1);
                 } else {
                     result = features.Test(a.Item1);
-
                 }
-                features.Train(a.Item2, result);    
-                features.Scan(purge:false);
+                features.Train(a.Item2, result, a.Item1);    
+                features.Scan(purge);
                 
                 for (int j = 0; j < Logger.Inst.GetIntVal("FeaturesToRecombine"); j++) {
                     features.Recombine();
@@ -98,5 +102,8 @@ namespace ImageRecognition {
         public List<Feature> Features { get; set; }
         public double MaxInterestingness { get; set; }
         public double MaxAttractiveness { get; set; }
-        }
+        
+        public double MaxSuccessRate { get; set; }
+        public double Monoticity { get; set; }
+    }
 }

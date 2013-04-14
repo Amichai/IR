@@ -39,9 +39,23 @@ namespace MyLogger {
             }
         }
 
+        public void SetColumns(params string[] vals) {
+            AppendNoTimeStamp(vals);
+        }
+
+        public void AppendNoTimeStamp(params object[] vals) {
+            using (StreamWriter logStream = logFile.AppendText()) {
+                foreach (var a in vals) {
+                    logStream.Write(a + ", ");
+                }
+                logStream.Write("\n");
+                logStream.Close();
+            }
+        }
+
         public void Append(params object[] vals) {
             using (StreamWriter logStream = logFile.AppendText()) {
-                logStream.Write(DateTime.Now.ToString() + ", ");
+                logStream.Write(DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToLongTimeString() + ", ");
                 foreach (var a in vals) {
                     logStream.Write(a + ", ");
                 }

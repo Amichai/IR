@@ -11,6 +11,8 @@
             <TextBlock Name="OutputFile"></TextBlock>
             <TextBlock Text="Total number of trials: "> <Run Text="{Binding TotalNumberOfTrials}"/></TextBlock>
             <TextBlock FontSize="20" Text="Success rate (last 100): "><Run Text="{Binding LastNSuccessRate}" /></TextBlock>
+                <TextBlock Margin="0,0,0,0" Text="Max success: "><Run Text="{Binding MaxSuccessRate}"/></TextBlock>
+                <TextBlock Margin="0,0,0,0" Text="Monoticity: "><Run Text="{Binding Monoticity}"/></TextBlock>
             <TextBlock Margin="0,0,0,0" Text="Feature Count: "><Run Text="{Binding FeatureCount}"/></TextBlock>
             <TextBlock Text="Average attractiveness: "><Run Text="{Binding AverageAtractiveness}" /></TextBlock>
                 <TextBlock Text="Max attractiveness: "><Run Text="{Binding MaxAttractiveness}" /></TextBlock>
@@ -22,11 +24,15 @@
             <ItemsControl Name="db" ItemsSource="{Binding SuccessRatePerLabel}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="8,0,0,0" Text="{Binding Key}" FontWeight="Bold" ></TextBlock>
-                            <TextBlock Margin="20,0,0,0" Text="{Binding Value.LastN2}"></TextBlock>
-                        </StackPanel>
-                    </DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding Key}" FontWeight="Bold" ></TextBlock>
+                                    <TextBlock Margin="20,0,0,0" Text="{Binding Value.LastN2}"></TextBlock>
+                                </StackPanel>
+                                <TextBlock Margin="50,0,0,0"  Text="Max val:  "><Run Text="{Binding Value.Max, Mode=OneWay}"/></TextBlock>
+                                <TextBlock Margin="50,0,0,0"  Text="Monoticity:  "><Run Text="{Binding Value.Monoticity, Mode=OneWay}"/></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </StackPanel>    

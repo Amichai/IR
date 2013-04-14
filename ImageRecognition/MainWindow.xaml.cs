@@ -36,6 +36,7 @@ namespace ImageRecognition {
             workbench.FeaturesTrained += workbench_FeaturesTrained;
             this.TrialParams.Text = Logger.Inst.SerializeParams().ToString();
             this.OutputFile.Text = "Output Filepath: " + Logger.Inst.OutputFilePath();
+            Logger.Inst.logFile.SetColumns("TimeStamp", "Number of trials", "Success rate (last 100)", "Feautre count", "Average Attractiveness", "Average Interestingness", "Average number of points", "Average number of data seen", "Max attractiveness", "Max interestingeness");
             bw.RunWorkerAsync();
             //this.FeautresList.ItemsSource = this.Features;
         }
@@ -59,6 +60,9 @@ namespace ImageRecognition {
             this.LastNSuccessRate = e.LastNSuccessRate;
             this.SuccessRatePerLabel = e.SuccessRatePerLabel;
             this.FeatureCount = e.FeatureCount;
+
+            this.MaxSuccessRate = e.MaxSuccessRate;
+            this.Monoticity = e.Monoticity;
 
             this.AverageAtractiveness = e.AverageAttractiveness;
             this.AverageInterestingness = e.AverageInterestingness;
@@ -117,6 +121,30 @@ namespace ImageRecognition {
         }
         private Dictionary<string, PastTrials> _SuccessRatePerLabel;
         public const string SuccessRatePerLabelPropertyName = "SuccessRatePerLabel";
+
+        public double Monoticity {
+            get { return _Monoticity; }
+            set {
+                if (_Monoticity != value) {
+                    _Monoticity = value;
+                    OnPropertyChanged(MonoticityPropertyName);
+                }
+            }
+        }
+        private double _Monoticity;
+        public const string MonoticityPropertyName = "Monoticity";
+
+        public double MaxSuccessRate {
+            get { return _MaxSuccessRate; }
+            set {
+                if (_MaxSuccessRate != value) {
+                    _MaxSuccessRate = value;
+                    OnPropertyChanged(MaxSuccessRatePropertyName);
+                }
+            }
+        }
+        private double _MaxSuccessRate;
+        public const string MaxSuccessRatePropertyName = "MaxSuccessRate";
 
         public int FeatureCount {
             get { return _FeatureCount; }

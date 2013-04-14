@@ -1,7 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <params>
-  <FeaturesToRecombine Value="1" />
-  <FeatureType Value="PixelDiff" />
+  <FeaturesToRecombine Value="5" />
+  <FeatureType Value="PixelQuot" />
+  <FeatureType2 Value="PixelDiff" />
   <EvaluateFeatureCount Value="true" />
-  <UseBoosterFeature Value="true" />
+  <UseBoosterFeature Value="false" />
+  <purge Value="false" />
+  <attractivenessPurgeThreshold Value="1"/>
+  <interestingnessPurgeThreshold Value="1" />
+  <usePixelFeatures Value="false" />
+  <compareValExponent Value=".5" />
 </params>

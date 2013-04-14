@@ -35,6 +35,10 @@ namespace MyLogger {
             }
         }
 
+        public double GetDouble(string name) {
+            return double.Parse(parameters[name].Value);
+        }
+
         public int GetIntVal(string name) {
             return int.Parse(parameters[name].Value);
         }
