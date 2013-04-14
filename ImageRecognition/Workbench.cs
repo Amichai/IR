@@ -44,7 +44,6 @@ namespace ImageRecognition {
                         TrainedFeatures = features.UsefulFeautres,
                         MaxAttractiveness = features.MaxAttractiveness,
                         MaxInterestingness = features.MaxInterestingness,
-                        Features = features.Get(),
                         MaxSuccessRate = features.Success.Overall.Max,
                         Monoticity = features.Success.Overall.Monoticity
                     });
@@ -63,7 +62,6 @@ namespace ImageRecognition {
         public void Process(IEnumerable<Tuple<int[][], string>> dataStream) {
             int i = 0;
             foreach (var a in dataStream) {
-
                 Dictionary<string, double> result;
                 if (testMethodology == "Test_scaleProbabilitiesToInfinity") {
                     result = features.Test_scaleProbabilitiesToInfinity(a.Item1);

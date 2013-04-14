@@ -71,8 +71,6 @@ namespace ImageRecognition {
 
             this.MaxInterestingness = e.MaxInterestingness;
             this.MaxAttractiveness = e.MaxAttractiveness;
-
-            this.Features = e.Features;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

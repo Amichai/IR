@@ -24,7 +24,6 @@ namespace ImageRecognition {
         private double? attractivenessPurgeThreshold;
         private double? interestingnessPurgeThreshold;
 
-
         private void addFeature(string fType, int idx1 ,int idx2) {
             if (fType == null) {
                 return;
@@ -34,8 +33,9 @@ namespace ImageRecognition {
             var l1 = f1.Projection.GetPoint();
             var l2 = f2.Projection.GetPoint();
             Feature newFeature;
-            switch (fType) {
-                case "PixelProjection":
+            
+            switch ((Feature.FType)Enum.Parse(typeof(Feature.FType), fType)) {
+                case Feature.FType.PixelProjection:
                     newFeature = new Feature() {
                         Projection = new PixelProjection(new List<IntPoint>() { l2.Value }) { 
                             Ref = f1.Projection, Ref2 = f2.Projection,
@@ -43,45 +43,45 @@ namespace ImageRecognition {
                         FeatureType = Feature.FType.PixelProjection
                     };
                     break;
-                case "PixelDiff":
+                case Feature.FType.PixelDiff:
                     if (f1.FeatureType != Feature.FType.PixelEval) return;
                     newFeature = new Feature() {
                         Projection = new PixelDiff(l2.Value, f1.Projection),
                         FeatureType = Feature.FType.PixelDiff
                     };
                     break;
-                case "SymmetricalPixelDiff":
+                case Feature.FType.SymmetricalPixelDiff:
                     newFeature = new Feature() {
                         Projection = new SymmetricalPixelDiff() { Ref = f1.Projection, Ref2 = f2.Projection },
                         FeatureType = Feature.FType.SymmetricalPixelDiff
                     };
                     break;
-                case "PixelSum":
+                case Feature.FType.PixelSum:
                     newFeature = new Feature() {
                         Projection = new PixelSum(l2.Value) { Ref = f1.Projection },
                         FeatureType = Feature.FType.PixelSum
                     };
                     break;
-                case "PixelQuot":
+                case Feature.FType.PixelQuot:
                     if (f1.FeatureType != Feature.FType.PixelEval) return;
                     newFeature = new Feature() {
                         Projection = new PixelQuot(l2.Value, f1.Projection),
                         FeatureType = Feature.FType.PixelQuot
                     };
                     break;
-                case "SymmetricalPixelQuot":
+                case Feature.FType.SymmetricalPixelQuot:
                     newFeature = new Feature() {
                         Projection = new SymmetricalPixelQuot() {  Ref = f1.Projection, Ref2 = f2.Projection },
                         FeatureType =  Feature.FType.SymmetricalPixelQuot
                     };
                     break;
-                case "PixelProd":
+                case Feature.FType.PixelProd:
                     newFeature = new Feature() {
                         Projection = new PixelProd(l2.Value) { Ref = f1.Projection },
                         FeatureType = Feature.FType.PixelProd
                     };
                     break;
-                case "SymmetricalPixelSum":
+                case Feature.FType.SymmetricalPixelSum:
                     newFeature = new Feature() {
                         Projection = new SymmetricalPixelSum() { Ref = f1.Projection, Ref2 = f2.Projection },
                         FeatureType = Feature.FType.SymmetricalPixelSum
@@ -103,19 +103,6 @@ namespace ImageRecognition {
             idx1 = recombine[rand.Next(count - 1)];
             idx2 = recombine[rand.Next(count - 1)];
             addFeature(featureType2, idx1, idx2);
-            
-
-            //var newFeature = new Feature() {
-            //    Func = new PixelDiff(l1) { Ref = f2.Func }
-            //};
-            //this.features.Add(newFeature);
-            //this.features.Add(new Feature() {
-            //    Func = new PixelSum(l2) { Ref = f1.Func }
-            //});
-        }
-
-        public List<Feature> Get() {
-            return this.features;
         }
 
         public void GeneratePixelFeatures(int width, int height) {
@@ -131,10 +118,6 @@ namespace ImageRecognition {
         }
 
         public FeatureSuccess Success;
-
-        public void Generate(int num) {
-            throw new NotImplementedException();
-        }
 
         public int Count() {
             return features.Count();
