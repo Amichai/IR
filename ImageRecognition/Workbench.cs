@@ -52,10 +52,6 @@ namespace ImageRecognition {
 
         AllFeatures features;
 
-        public void Purge(List<int> features) {
-            this.features.Purge(features);
-        }
-
         private bool purge;
 
         //Define a bunch of events so that the parent class can observe everything that happens here
@@ -72,7 +68,7 @@ namespace ImageRecognition {
                 features.Scan(purge);
                 
                 for (int j = 0; j < Logger.Inst.GetIntVal("FeaturesToRecombine"); j++) {
-                    features.Recombine();
+                    features.Recombine(Feature.FType.unknown, Feature.FType.unknown);
                 }
                 if (i++ % 10 == 0) {
                     ///Feautres get deleted on the other end of this event!
