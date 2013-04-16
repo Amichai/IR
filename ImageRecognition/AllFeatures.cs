@@ -17,6 +17,7 @@ namespace ImageRecognition {
             this.attractivenessPurgeThreshold = Logger.Inst.GetDouble("attractivenessPurgeThreshold");
             this.interestingnessPurgeThreshold = Logger.Inst.GetDouble("interestingnessPurgeThreshold");
             this.usePixelFeatures = Logger.Inst.GetBool("usePixelFeatures");
+            this.weighFeaturesOnSuccess = Logger.Inst.GetBool("WeighFeaturesBySuccess");
         }
 
         private string featureType = null;
@@ -45,7 +46,6 @@ namespace ImageRecognition {
                     };
                     break;
                 case Feature.FType.PixelDiff:
-                    if (f1.FeatureType != Feature.FType.PixelEval) return;
                     newFeature = new Feature() {
                         Projection = new PixelDiff(l2.Value, f1.Projection),
                         FeatureType = Feature.FType.PixelDiff
@@ -64,7 +64,6 @@ namespace ImageRecognition {
                     };
                     break;
                 case Feature.FType.PixelQuot:
-                    if (f1.FeatureType != Feature.FType.PixelEval) return;
                     newFeature = new Feature() {
                         Projection = new PixelQuot(l2.Value, f1.Projection),
                         FeatureType = Feature.FType.PixelQuot
@@ -119,13 +118,16 @@ namespace ImageRecognition {
             int type1Count = 0, type2Count = 0;
             if (type1 == Feature.FType.unknown) {
                 type1 = getRandomType();
-                type1Count = recombine[type1].Count();
             }
+            if (!recombine.ContainsKey(type1) && !recombine.ContainsKey(type2)) {
+                return;
+            }
+            type1Count = recombine[type1].Count();
 
             if (type2 == Feature.FType.unknown) {
                 type2 = getRandomType();
-                type2Count = recombine[type2].Count();
             }
+            type2Count = recombine[type2].Count();
             
             int idx1 = recombine[type1][rand.Next(type1Count - 1)];
             int idx2 = recombine[type2][rand.Next(type2Count - 1)];
@@ -195,6 +197,7 @@ namespace ImageRecognition {
         }
 
         private bool? usePixelFeatures = null;
+        private bool weighFeaturesOnSuccess;
 
         internal Dictionary<string, double> Test(int[][] p) {
             Dictionary<string, double> probabilities = new Dictionary<string, double>();
@@ -207,7 +210,15 @@ namespace ImageRecognition {
                         if (!probabilities.ContainsKey(r.Key)) {
                             probabilities[r.Key] = 0;
                         }
-                        probabilities[r.Key] += r.Value;
+                        if (weighFeaturesOnSuccess) {
+                            if (!f.IsTrained) continue;
+                            double eps = f.SuccessRate.Overall.LastN();
+                            double alpha = .5 * Math.Log((1.0 - eps + .0001) / eps + .0001);
+                            probabilities[r.Key] += r.Value * alpha;
+                        } else {
+                            probabilities[r.Key] += r.Value;
+                        }
+
                     }
                 }
             }
@@ -345,6 +356,11 @@ namespace ImageRecognition {
                             }
                         recombine[fType].Add(i);
                     }
+                    ///TEMPORPARY HACK/TEST CODE PUT BACK OLD METHOD! 
+                    //if (!this.recombine.ContainsKey(fType)) {
+                    //    recombine[fType] = new List<int>();
+                    //}
+                    //recombine[fType].Add(i);
                 }
             }
         }

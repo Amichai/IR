@@ -14,8 +14,10 @@ namespace ImageRecognition {
             features.GeneratePixelFeatures(28, 28);
             this.testMethodology = Logger.Inst.GetString("TestMethod");
             this.purge = Logger.Inst.GetBool("purge");
+            this.sourceInPixelFeaturesOnly = Logger.Inst.GetBool("SourceInPixelFeautresOnly");
         }
 
+        private bool sourceInPixelFeaturesOnly;
         string testMethodology = null;
 
         public event EventHandler<TrainingDataEventArgs> InputLoaded;
@@ -37,7 +39,7 @@ namespace ImageRecognition {
                         AverageInterestingness = features.AverageInterestingness(),
                         AverageNumberOfDataSeen = features.AverageNumberOfDataSeen(),
                         AverageNumberOfPoints = features.AverageNumberOfPoints(),
-                        FeatureCount = features.Count(),
+                        FeatureCount = features.GetAllFeatures().Count(),
                         LastNSuccessRate = features.Success.Overall.LastN(),
                         SuccessRatePerLabel = features.Success.LabelSuccess,
                         TotalNumberOfTrials = features.Success.TrialCounter,
@@ -64,11 +66,16 @@ namespace ImageRecognition {
                 } else {
                     result = features.Test(a.Item1);
                 }
+
                 features.Train(a.Item2, result, a.Item1);    
                 features.Scan(purge);
                 
                 for (int j = 0; j < Logger.Inst.GetIntVal("FeaturesToRecombine"); j++) {
-                    features.Recombine(Feature.FType.unknown, Feature.FType.unknown);
+                    if (sourceInPixelFeaturesOnly) {
+                        features.Recombine(Feature.FType.PixelEval, Feature.FType.PixelEval);
+                    } else {
+                        features.Recombine(Feature.FType.unknown, Feature.FType.unknown);
+                    }
                 }
                 if (i++ % 10 == 0) {
                     ///Feautres get deleted on the other end of this event!
