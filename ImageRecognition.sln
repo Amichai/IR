@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRCommon", "..\Common\PRCom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLogger", "Logger\MyLogger.csproj", "{0FF2FC2B-3CE8-4D68-8646-0F921C6AF141}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workbench", "Workbench\Workbench.csproj", "{B7B7694E-2CDA-4DDD-AF25-C27C83696563}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{0FF2FC2B-3CE8-4D68-8646-0F921C6AF141}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0FF2FC2B-3CE8-4D68-8646-0F921C6AF141}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0FF2FC2B-3CE8-4D68-8646-0F921C6AF141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

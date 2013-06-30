@@ -5,3 +5,6 @@ ImageRecognition/bin/Release
 ImageRecognition/obj/
 Logger/bin/
 Logger/obj/
+packages
+Workbench/bin/
+Workbench/obj/

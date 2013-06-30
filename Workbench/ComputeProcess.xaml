@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="Workbench.ComputeProcess"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             >
+    <ScrollViewer>
+        <StackPanel Name="root">
+        <CheckBox IsChecked="{Binding UpdateStats}">Update Stats</CheckBox>
+        <TextBlock Text="Last update: "><Run Text="{Binding LastUpdate}"/></TextBlock>
+        <TextBlock Text="Time to update: "><Run Text="{Binding TimeToUpdate}"/></TextBlock>
+        <TextBlock Text="Output Filepath: " FontWeight="Bold" />
+            <TextBlock Margin="20,0,0,0" TextDecorations="Underline" Foreground="Blue" Text="{Binding OutputFilePath}" PreviewMouseDown="Run_PreviewMouseDown_1"  FontWeight="Normal"/>
+        <TextBlock Text="Success Rate: " FontSize="20" FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding LastNSuccessRate}"/></TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Margin="10,0,0,0" Text="Number of trials: " FontWeight="Bold"><Run FontWeight="Normal" Text="{Binding TotalNumberOfTrials}"/></TextBlock>
+        </StackPanel>
+        <TextBlock Text="Max Success: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding MaxSuccessRate}"/></TextBlock>
+        <TextBlock Text="Monoticity: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding Monoticity}"/></TextBlock>
+        <TextBlock Text="Feature Count: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding FeatureCount}"/></TextBlock>
+        <TextBlock Text="Average Attractiveness: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding AverageAttractiveness}"/></TextBlock>
+        <TextBlock Text="Max Attractiveness: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding MaxAttractiveness}"/></TextBlock>
+        <TextBlock Text="Average Interestingness: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding AverageInterestingness}"/></TextBlock>
+        <TextBlock Text="Max Interestingness: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding MaxInterestingness}"/></TextBlock>
+        <TextBlock Text="Points per feature (ave): " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding AverageNumberOfPoints}"/></TextBlock>
+        <TextBlock Text="Data seen per features: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding AverageNumberOfDataSeen}"/></TextBlock>
+        <TextBlock Text="Success over Last 100 trials:" FontWeight="Bold"></TextBlock>
+        <ItemsControl Name="db" ItemsSource="{Binding SuccessRatePerLabel}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="8,0,0,0" Text="{Binding Key}" FontWeight="Bold" ></TextBlock>
+                            <TextBlock Margin="20,0,0,0" Text="{Binding Value.LastN2}"></TextBlock>
+                        </StackPanel>
+                        <TextBlock Margin="50,0,0,0"  Text="Max val:  "><Run Text="{Binding Value.Max, Mode=OneWay}"/></TextBlock>
+                        <TextBlock Margin="50,0,0,0"  Text="Monoticity:  "><Run Text="{Binding Value.Monoticity, Mode=OneWay}"/></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+    </ScrollViewer>
+</UserControl>

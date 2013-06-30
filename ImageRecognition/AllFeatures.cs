@@ -18,12 +18,15 @@ namespace ImageRecognition {
             this.interestingnessPurgeThreshold = Logger.Inst.GetDouble("interestingnessPurgeThreshold");
             this.usePixelFeatures = Logger.Inst.GetBool("usePixelFeatures");
             this.weighFeaturesOnSuccess = Logger.Inst.GetBool("WeighFeaturesBySuccess");
+            this.gaussian = Logger.Inst.GetBool("PixelProdGaussianDist");
         }
 
         private string featureType = null;
         private string featureType2 = null;
         private double? attractivenessPurgeThreshold;
         private double? interestingnessPurgeThreshold;
+
+        private bool gaussian;
 
         private void addFeature(string fType, Feature.FType type1, int idx1, Feature.FType type2, int idx2) {
             if (fType == null) {
@@ -41,6 +44,20 @@ namespace ImageRecognition {
                         Projection = new PixelProjection(new List<IntPoint>() { l2.Value }) {
                             Ref = f1.Projection,
                             Ref2 = f2.Projection,
+                            GaussianDist = gaussian
+                        },
+                        FeatureType = Feature.FType.PixelProjection
+                    };
+                    break;
+                case Feature.FType.PixelProjectionVarLength:
+                    List<Feature> refs = new List<Feature>();
+                    refs.Add(f1);
+                    refs.Add(f2);
+                    newFeature = new Feature() {
+                        Projection = new PixelProjectionVarLength(new List<IntPoint>() { l2.Value }) {
+                            Ref = f1.Projection,
+                            Features = refs,
+                            GaussianDist = gaussian
                         },
                         FeatureType = Feature.FType.PixelProjection
                     };
@@ -128,13 +145,33 @@ namespace ImageRecognition {
                 type2 = getRandomType();
             }
             type2Count = recombine[type2].Count();
-            
+
             int idx1 = recombine[type1][rand.Next(type1Count - 1)];
             int idx2 = recombine[type2][rand.Next(type2Count - 1)];
             addFeature(featureType, type1, idx1, type2, idx2);
             idx1 = recombine[type1][rand.Next(type1Count - 1)];
             idx2 = recombine[type2][rand.Next(type2Count - 1)];
             addFeature(featureType2, type1, idx1, type2, idx2);
+        }
+
+        public void RecombineReinforce() {
+            int idx1, idx2;
+            foreach (var type in recombine) {
+                if (type.Value.Count() < 2) continue;
+                idx1 = rand.Next(type.Value.Count() - 1);
+                idx2 = rand.Next(type.Value.Count() - 1);
+                if (type.Key == Feature.FType.PixelEval) {
+                    if (rand.NextDouble() > .5) {
+                        addFeature(featureType, Feature.FType.PixelEval, idx1, Feature.FType.PixelEval, idx2);
+                    } else {
+                        addFeature(featureType2, Feature.FType.PixelEval, idx1, Feature.FType.PixelEval, idx2);
+                    }
+                } else {
+                    if (rand.NextDouble() > .5) {
+                        addFeature(type.Key.ToString(), type.Key, idx1, type.Key, idx2);
+                    }
+                }
+            }
         }
 
         public void GeneratePixelFeatures(int width, int height) {
@@ -201,6 +238,7 @@ namespace ImageRecognition {
 
         internal Dictionary<string, double> Test(int[][] p) {
             Dictionary<string, double> probabilities = new Dictionary<string, double>();
+            double eps = 1e-8;
             foreach (var fType in features.Keys) {
                 foreach (var f in features[fType]) {
                     var results = f.Test(p);
@@ -211,14 +249,20 @@ namespace ImageRecognition {
                             probabilities[r.Key] = 0;
                         }
                         if (weighFeaturesOnSuccess) {
-                            if (!f.IsTrained) continue;
-                            double eps = f.SuccessRate.Overall.LastN();
-                            double alpha = .5 * Math.Log((1.0 - eps + .0001) / eps + .0001);
-                            probabilities[r.Key] += r.Value * alpha;
+                            if (f.SuccessRate.LabelSuccess.ContainsKey(r.Key) && f.IsTrained) {
+                                //double success = f.SuccessRate.LabelSuccess[r.Key].LastN();
+                                double success = f.SuccessRate.Outcomes.Get(r.Value);
+                                double error = 1 - success;
+                                double alpha = .5 * Math.Log((9.0 - 9 * error) / (error + .01) + .01);
+                                probabilities[r.Key] += r.Value * alpha;    
+                            } else {
+                                probabilities[r.Key] += rand.NextDouble();
+                            }
                         } else {
+                            //var acc = f.SuccessRate.Outcomes.Get(r.Value);
+                            //probabilities[r.Key] += r.Value * acc;
                             probabilities[r.Key] += r.Value;
                         }
-
                     }
                 }
             }
@@ -313,16 +357,27 @@ namespace ImageRecognition {
             UsefulFeautres = 0;
             interestingnessVals = new List<double>();
             attractivenessVals = new List<double>();
+            int? worstFeautreIndex = null;
+            double worstFeatureValue = double.MaxValue;
+            Feature.FType worstFeatureType = Feature.FType.unknown;
             dataSeen = new List<int>();
             foreach(var fType in features.Keys){
                 for (int i = 0; i < features[fType].Count(); i++) {
-                    if (!features[fType][i].Trained()) continue;
+                    var f = features[fType][i];
+                    if (!f.Trained()) continue;
                     var attract = features[fType][i].Attractiveness;
                     attractivenessVals.Add(attract.Value);
                     UsefulFeautres++;
                     var interestingness = features[fType][i].Interestingness;
                     interestingnessVals.Add(interestingness);
                     dataSeen.Add(features[fType][i].DataSeen);
+                    if (f.IsTrained && 
+                        f.FeatureType != Feature.FType.PixelEval &&
+                        f.SuccessRate.Overall.LastN() < worstFeatureValue) {
+                        worstFeatureValue = f.SuccessRate.Overall.LastN();
+                        worstFeautreIndex = i;
+                        worstFeatureType = fType;
+                    }
 
                     if (attract > MaxAttractiveness) {
                         MaxAttractiveness = attract.Value;
@@ -332,14 +387,19 @@ namespace ImageRecognition {
                     }
                     ///Deletion:
                     if (
-                        features[fType][i].Trained(10)
+                        //f.SuccessRate.Overall.Monoticity < .8 &&
+                        fType != Feature.FType.PixelEval &&
+                        f.Trained(20) &&
+                        interestingness < 1
+                        //f.SuccessRate.Overall.LastN() < .1 
+
                         //&& interestingness < purgeThreshold
                         //&& attract < .01
-                        && attract < lastMeanAttractiveness * attractivenessPurgeThreshold
-                        && interestingness < lastMeanInterestingness * interestingnessPurgeThreshold
+                        //&& attract < lastMeanAttractiveness * attractivenessPurgeThreshold
+                        //&& interestingness < lastMeanInterestingness * interestingnessPurgeThreshold
                         //&& attract < lastMeanAttractiveness * .1
                         //&& interestingness < lastMeanInterestingness
-                        //&& interestingness < lastMeanInterestingness * .85
+                        //&& interestingness < lastMeanInterestingness * .65
                     ) {
                         if (purge) {
                             this.features[fType].RemoveAt(i);
@@ -356,13 +416,13 @@ namespace ImageRecognition {
                             }
                         recombine[fType].Add(i);
                     }
-                    ///TEMPORPARY HACK/TEST CODE PUT BACK OLD METHOD! 
-                    //if (!this.recombine.ContainsKey(fType)) {
-                    //    recombine[fType] = new List<int>();
-                    //}
-                    //recombine[fType].Add(i);
                 }
             }
+            //if (worstFeatureType != Feature.FType.unknown) {
+            //    var worstFeature = this.features[worstFeatureType][worstFeautreIndex.Value];
+            //    Debug.Print("Feature removed: " + worstFeatureType.ToString() + " last N: " + worstFeature.SuccessRate.Overall.LastN().ToString());
+            //    this.features[worstFeatureType].RemoveAt(worstFeautreIndex.Value);
+            //}
         }
 
         //Must be called after a scan

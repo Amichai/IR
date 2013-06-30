@@ -4,15 +4,15 @@
   <FeatureType Value="PixelDiff" />
   <FeatureType2 Value="PixelDiff" />
   <usePixelFeatures Value="false" />
-  <purge Value="false" />
+  <purge Value="true" />
   <SourceInPixelFeautresOnly Value="false" />
   <EvaluateFeatureCount Value="false" />
   <OnlyTrainOnFailure Value="true" />
-  <WeighFeaturesBySuccess Value="true" />
-  
-  ///Unused:
+  <WeighFeaturesBySuccess Value="false" />
   <attractivenessPurgeThreshold Value="1"/>
   <interestingnessPurgeThreshold Value="1" />
   <compareValExponent Value=".5" />
+
+  <PixelProdGaussianDist Value="true" />
   
 </params>

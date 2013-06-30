@@ -1,0 +1,71 @@
+﻿<Window x:Class="Workbench.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        Title="MainWindow" Height="550" Width="525">
+    <Grid>
+        <ad:DockingManager x:Name="dockManager">
+            <ad:LayoutRoot>
+                <ad:LayoutPanel>
+                    <ad:LayoutDocumentPaneGroup>
+                        <ad:LayoutDocumentPane x:Name="documentPane">
+                            <ad:LayoutDocument Title="Process Spawn" CanClose="False">
+                                <ScrollViewer>
+                                    <StackPanel>
+                                        <Button Margin="7" Width="100" Height="30" HorizontalAlignment="Left" Click="Spawn">Spawn</Button>
+
+                                        <TextBlock FontSize="20">Feature Settings:</TextBlock>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="150"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition  Height="30" />
+                                                <RowDefinition  Height="30" />
+                                                <RowDefinition  />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Number of features to recombine:</TextBlock>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NumberOfFeatures}"></TextBox>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Feautre Type 1:</TextBlock>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Feature1}"></TextBox>
+
+                                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Feature Type 2:</TextBlock>
+                                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Feautre2}"></TextBox>
+                                        </Grid>
+                                        <TextBlock FontSize="20">Compute Settings:</TextBlock>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="150"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition  Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Compute pixel feature:</TextBlock>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ComputePixelFeatures}" Grid.RowSpan="2"></TextBox>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Weigh features by success:</TextBlock>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WeighFeaturesBySuccess}"></TextBox>
+
+                                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Compare val exponent:</TextBlock>
+                                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CompareValExponent}"></TextBox>
+
+                                        </Grid>
+                                        <TextBlock FontSize="20">Purge Settings:</TextBlock>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </ad:LayoutDocument>
+                        </ad:LayoutDocumentPane>
+                    </ad:LayoutDocumentPaneGroup>
+                </ad:LayoutPanel>
+            </ad:LayoutRoot>
+        </ad:DockingManager>
+    </Grid>
+</Window>
