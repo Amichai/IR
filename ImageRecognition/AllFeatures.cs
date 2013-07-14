@@ -390,9 +390,9 @@ namespace ImageRecognition {
                         //f.SuccessRate.Overall.Monoticity < .8 &&
                         fType != Feature.FType.PixelEval &&
                         f.Trained(20) &&
-                        interestingness < 1
+                        //interestingness < 1
                         //f.SuccessRate.Overall.LastN() < .1 
-
+                        f.SuccessRate.Overall.Probability() < .1
                         //&& interestingness < purgeThreshold
                         //&& attract < .01
                         //&& attract < lastMeanAttractiveness * attractivenessPurgeThreshold

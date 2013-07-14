@@ -1,18 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <params>
+  <!--found-->
   <FeaturesToRecombine Value="1" />
   <FeatureType Value="PixelDiff" />
   <FeatureType2 Value="PixelDiff" />
   <usePixelFeatures Value="false" />
+  
   <purge Value="true" />
-  <SourceInPixelFeautresOnly Value="false" />
-  <EvaluateFeatureCount Value="false" />
-  <OnlyTrainOnFailure Value="true" />
+  <SourceInPixelFeaturesOnly Value="false" />
+  
   <WeighFeaturesBySuccess Value="false" />
   <attractivenessPurgeThreshold Value="1"/>
   <interestingnessPurgeThreshold Value="1" />
   <compareValExponent Value=".5" />
 
+  <EvaluateFeatureCount Value="false" />
   <PixelProdGaussianDist Value="true" />
+
+  <OnlyTrainOnFailure Value="true" />
   
 </params>

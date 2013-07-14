@@ -23,6 +23,14 @@ namespace MyLogger {
             this.logFile.SetTrialData(SerializeParams());
         }
 
+        public void Update(string name, string value) {
+            if (!parameters.ContainsKey(name)) {
+                throw new Exception("unknown param");
+            }
+            parameters[name] = new LogParam() { Value = value, Detail = "" };
+            this.logFile.SetTrialData(SerializeParams());
+        }
+
         public bool GetBool(string name) {
             return bool.Parse(parameters[name].Value);
         }
@@ -56,13 +64,14 @@ namespace MyLogger {
         public string paramFilename { get; set; }
 
         ///TODO: handle filenames better
-        public void Deserialize(string filename) {
+        public Dictionary<string, LogParam> Deserialize(string filename) {
             this.paramFilename = filename;
             XElement root = XElement.Load(filename);
             this.logFile.SetTrialData(root);
             foreach (var a in root.Elements()) {
                 parameters[a.Name.ToString()] = LogParam.FromXml(a);
             }
+            return parameters;
         }
 
         private Dictionary<string, LogParam> parameters;

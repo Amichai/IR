@@ -21,19 +21,23 @@ namespace Workbench {
     /// Interaction logic for ComputeProcess.xaml
     /// </summary>
     public partial class ComputeProcess : UserControl, INotifyPropertyChanged {
-        public ComputeProcess() {
+        public ComputeProcess(InputLoader loader) {
             InitializeComponent();
             this.UpdateStats = true;
             this.DataContext = this;
-            Logger.Inst.Deserialize(@"..\..\..\Logger\TrialParams.xml");
             this.OutputFilePath = Logger.Inst.OutputFilePath();
             this.workbench = new ImageRecognition.Workbench();
-            this.loader = new InputLoader();
-            loader.LoadFile(@"C:\Users\Amichai\Data\digits.csv");
+            this.loader = loader;
             Logger.Inst.logFile.SetColumns("TimeStamp", "Number of trials", "Success rate (last 100)", "Feautre count", "Average Attractiveness", "Average Interestingness", "Average number of points", "Average number of data seen", "Max attractiveness", "Max interestingeness");
             workbench.FeaturesTrained += workbench_FeaturesTrained;
             bw.DoWork += bw_DoWork;
+            this.Settings.Text = Logger.Inst.SerializeParams().ToString();
+            this.ProcessIndex = processCounter++;
+            this.featureLogDestination.Text = "featureLog.txt";
         }
+
+        private static int processCounter = 0;
+        public int ProcessIndex { get; private set; }
 
         private void workbench_FeaturesTrained(object sender, ImageRecognition.FeaturesTrainedEventArgs e) {
             Logger.Inst.SetResult(e.TotalNumberOfTrials, e.LastNSuccessRate, e.FeatureCount,
@@ -65,6 +69,7 @@ namespace Workbench {
             this.TimeToUpdate = now.Subtract(this.LastUpdate);
             this.LastUpdate = now;
         }
+
         #region Public Properties
         private TimeSpan _TimeToUpdate;
         public TimeSpan TimeToUpdate {
@@ -271,10 +276,28 @@ namespace Workbench {
             Process.Start(tb.Text);
         }
 
-        BackgroundWorker bw = new BackgroundWorker();
+        AbortableBackgroundWorker bw = new AbortableBackgroundWorker();
 
         public void Start() {
             bw.RunWorkerAsync();
+        }
+
+        internal void Kill() {
+            if (bw.IsBusy) {
+                bw.Abort();
+                bw.Dispose();
+            }
+        }
+
+        private void LogAllFeatures_Click(object sender, RoutedEventArgs e) {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("index,type,data seen,success rate last 100, monoticity, intersetingness, attractiveness, number of points");
+            foreach (var f in this.workbench.AllFeatures) {
+                sb.AppendLine(string.Format("{0},{1},{2},{3},{4},{5},{6},{7}", f.CreationIndex, f.FeatureType, f.DataSeen, f.SuccessRate.Overall.LastN(100), f.SuccessRate.Overall.Monoticity, f.Interestingness, f.Attractiveness, f.NumberOfPoints));
+            }
+            string outputPath = this.featureLogDestination.Text;
+            System.IO.File.WriteAllText(outputPath, sb.ToString());
+            Process.Start(outputPath);
         }
     }
 }

@@ -37,6 +37,11 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-    </StackPanel>
+         <TextBlock Name="Settings"></TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <Button Click="LogAllFeatures_Click" Margin="5">Log All Features</Button>
+                <TextBox Width="200" Margin="5" Name="featureLogDestination"></TextBox>
+            </StackPanel>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>

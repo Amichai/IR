@@ -2,6 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:ir="clr-namespace:ImageRecognition;assembly=ImageRecognition"
+        xmlns:c="clr-namespace:PRCommon;assembly=PRCommon"
         Title="MainWindow" Height="550" Width="525">
     <Grid>
         <ad:DockingManager x:Name="dockManager">
@@ -31,10 +33,10 @@
                                             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NumberOfFeatures}"></TextBox>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Feautre Type 1:</TextBlock>
-                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Feature1}"></TextBox>
+                                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Feature1}"></TextBox>
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Feature Type 2:</TextBlock>
-                                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Feautre2}"></TextBox>
+                                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Feature2}"></TextBox>
                                         </Grid>
                                         <TextBlock FontSize="20">Compute Settings:</TextBlock>
                                         <Grid>
@@ -47,6 +49,7 @@
                                                 <RowDefinition  Height="30" />
                                                 <RowDefinition Height="30" />
                                                 <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
                                             </Grid.RowDefinitions>
                                             <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Compute pixel feature:</TextBlock>
                                             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ComputePixelFeatures}" Grid.RowSpan="2"></TextBox>
@@ -56,9 +59,46 @@
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Compare val exponent:</TextBlock>
                                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CompareValExponent}"></TextBox>
+                                            
+                                            <TextBlock Grid.Row="3" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Source in pixel features only:</TextBlock>
+                                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SourceInPixelFeaturesOnly}"></TextBox>
 
+                                            <TextBlock Grid.Row="4" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Only train on failure:</TextBlock>
+                                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding OnlyTrainOnFailure}"></TextBlock>
                                         </Grid>
                                         <TextBlock FontSize="20">Purge Settings:</TextBlock>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="150"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition  Height="30" />
+                                                <RowDefinition Height="30" />
+                                                <RowDefinition Height="30" />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock Grid.Row="0" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Purge?:</TextBlock>
+                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Purge}" Grid.RowSpan="2"></TextBox>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Attractiveness Threshold:</TextBlock>
+                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding AttractivenessThreshold}"></TextBox>
+
+                                            <TextBlock Grid.Row="2" Grid.Column="0" FontWeight="Bold" VerticalAlignment="Center">Interestingness Threshold:</TextBlock>
+                                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding InterestingnessThreshold}"></TextBox>
+
+                                        </Grid>
+                                        
+                                        <ItemsControl Name="successRates">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Width="60" Text="{Binding Key}" FontWeight="Bold"><Run Text=": "/></TextBlock>
+                                                        <TextBlock Width="90" Text="{Binding Value}"></TextBlock>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </StackPanel>
                                 </ScrollViewer>
                             </ad:LayoutDocument>

@@ -14,7 +14,7 @@ namespace ImageRecognition {
             features.GeneratePixelFeatures(28, 28);
             this.testMethodology = Logger.Inst.GetString("TestMethod");
             this.purge = Logger.Inst.GetBool("purge");
-            this.sourceInPixelFeaturesOnly = Logger.Inst.GetBool("SourceInPixelFeautresOnly");
+            this.sourceInPixelFeaturesOnly = Logger.Inst.GetBool("SourceInPixelFeaturesOnly");
         }
 
         private bool sourceInPixelFeaturesOnly;
@@ -52,7 +52,13 @@ namespace ImageRecognition {
             }
         }
 
-        AllFeatures features;
+        private AllFeatures features;
+
+        public IEnumerable<Feature> AllFeatures {
+            get {
+                return features.GetAllFeatures();
+            }
+        }
 
         private bool purge;
 

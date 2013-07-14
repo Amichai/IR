@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace MyLogger {
-    struct LogParam {
+    public struct LogParam {
         public string Value { get; set; }
         public string Detail { get; set; }
 
