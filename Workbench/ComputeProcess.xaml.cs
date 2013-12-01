@@ -34,6 +34,8 @@ namespace Workbench {
             this.Settings.Text = Logger.Inst.SerializeParams().ToString();
             this.ProcessIndex = processCounter++;
             this.featureLogDestination.Text = "featureLog.txt";
+            this.PurgePercentage = workbench.PurgeVal;
+            this.RecombinePercentage = workbench.RecombineVal;
         }
 
         private static int processCounter = 0;
@@ -238,6 +240,30 @@ namespace Workbench {
                 if (_LastUpdate != value) {
                     _LastUpdate = value;
                     OnPropertyChanged("LastUpdate");
+                }
+            }
+        }
+
+        private double _PurgePercentage;
+        public double PurgePercentage {
+            get { return _PurgePercentage; }
+            set {
+                this.workbench.PurgeVal = value;
+                if (_PurgePercentage != value) {
+                    _PurgePercentage = value;
+                    OnPropertyChanged("PurgePercentage");
+                }
+            }
+        }
+
+        private double _RecombinePercentage;
+        public double RecombinePercentage {
+            get { return _RecombinePercentage; }
+            set {
+                this.workbench.RecombineVal = value;
+                if (_RecombinePercentage != value) {
+                    _RecombinePercentage = value;
+                    OnPropertyChanged("RecombinePercentage");
                 }
             }
         }

@@ -348,7 +348,7 @@ namespace ImageRecognition {
         double purgeThreshold = 1.0;
         double thresholdIncrementVal = .0000;
 
-        public void Scan(bool purge = false) {
+        public void Scan(double recombineVal, double purgeVal, bool purge = false) {
             purgeThreshold += thresholdIncrementVal;
             actions = new Dictionary<int, featureAction>();
             recombine = new Dictionary<Feature.FType, List<int>>();
@@ -389,10 +389,10 @@ namespace ImageRecognition {
                     if (
                         //f.SuccessRate.Overall.Monoticity < .8 &&
                         fType != Feature.FType.PixelEval &&
-                        f.Trained(20) &&
+                        f.Trained(10) &&
                         //interestingness < 1
                         //f.SuccessRate.Overall.LastN() < .1 
-                        f.SuccessRate.Overall.Probability() < .1
+                        f.SuccessRate.Overall.Probability() < purgeVal
                         //&& interestingness < purgeThreshold
                         //&& attract < .01
                         //&& attract < lastMeanAttractiveness * attractivenessPurgeThreshold
@@ -401,15 +401,16 @@ namespace ImageRecognition {
                         //&& interestingness < lastMeanInterestingness
                         //&& interestingness < lastMeanInterestingness * .65
                     ) {
-                        if (purge) {
+                       if (purge) {
                             this.features[fType].RemoveAt(i);
                             i--;
                         }
                     } else if (
-                        attract > lastMeanAttractiveness
-                        && interestingness > lastMeanInterestingness
+                        //attract > lastMeanAttractiveness
+                        //&& interestingness > lastMeanInterestingness
                         //attract > MaxAttractiveness * .9
                         //interestingness > .09
+                        f.SuccessRate.Overall.Probability() > recombineVal
                         ) {
                             if (!this.recombine.ContainsKey(fType)) {
                                 recombine[fType] = new List<int>();

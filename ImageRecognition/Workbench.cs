@@ -62,6 +62,11 @@ namespace ImageRecognition {
 
         private bool purge;
 
+
+        public double RecombineVal = .12;
+        public double PurgeVal = .1;
+
+
         //Define a bunch of events so that the parent class can observe everything that happens here
         public void Process(IEnumerable<Tuple<int[][], string>> dataStream) {
             int i = 0;
@@ -74,7 +79,7 @@ namespace ImageRecognition {
                 }
 
                 features.Train(a.Item2, result, a.Item1);    
-                features.Scan(purge);
+                features.Scan(RecombineVal, PurgeVal, purge);
                 
                 for (int j = 0; j < Logger.Inst.GetIntVal("FeaturesToRecombine"); j++) {
                     if (sourceInPixelFeaturesOnly) {

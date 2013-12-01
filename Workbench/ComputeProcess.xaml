@@ -13,7 +13,15 @@
         <StackPanel Orientation="Horizontal">
             <TextBlock Margin="10,0,0,0" Text="Number of trials: " FontWeight="Bold"><Run FontWeight="Normal" Text="{Binding TotalNumberOfTrials}"/></TextBlock>
         </StackPanel>
-        <TextBlock Text="Max Success: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding MaxSuccessRate}"/></TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Recombine Val: </TextBlock>
+                <TextBox Margin="10,0,0,0" Width="100" Text="{Binding RecombinePercentage}"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Purge Val:</TextBlock>
+                <TextBox Margin="10,0,0,0" Width="100" Text="{Binding PurgePercentage}"></TextBox>
+            </StackPanel>
+            <TextBlock Text="Max Success: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding MaxSuccessRate}"/></TextBlock>
         <TextBlock Text="Monoticity: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding Monoticity}"/></TextBlock>
         <TextBlock Text="Feature Count: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding FeatureCount}"/></TextBlock>
         <TextBlock Text="Average Attractiveness: " FontWeight="Bold"><Run   FontWeight="Normal" Text="{Binding AverageAttractiveness}"/></TextBlock>

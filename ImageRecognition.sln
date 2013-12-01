@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLogger", "Logger\MyLogger
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workbench", "Workbench\Workbench.csproj", "{B7B7694E-2CDA-4DDD-AF25-C27C83696563}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workbench2", "Workbench2\Workbench2.csproj", "{58AC2325-67C5-4C55-A3AB-130071326D69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7B7694E-2CDA-4DDD-AF25-C27C83696563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58AC2325-67C5-4C55-A3AB-130071326D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58AC2325-67C5-4C55-A3AB-130071326D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58AC2325-67C5-4C55-A3AB-130071326D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58AC2325-67C5-4C55-A3AB-130071326D69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
