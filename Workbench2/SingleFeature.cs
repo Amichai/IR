@@ -17,6 +17,7 @@ namespace Workbench2 {
             this.binMax = null;
             this.binMin = null;
             this.firstVal = null;
+            this.success = new FeatureSuccess();
         }
 
         double? firstVal;
@@ -75,36 +76,6 @@ namespace Workbench2 {
             //Debug.Print("Interestingness; {0}", i1);
             return i1;
         }
-        
-        //private List<Tuple<double, string>> pastVals;
-
-        private List<double> newInterestingnessVals(double incr) {
-            List<double> result = new List<double>();
-            var binMinInit = binMin;
-            var binMaxInit = binMax;
-            binMin += incr;
-            var newVal1 = Interestingness();
-            result.Add(newVal1);
-            binMin -= incr;
-
-            binMin -= incr;
-            var newVal2 = Interestingness();
-            result.Add(newVal2);
-
-            binMin += incr;
-
-            binMax += incr;
-            var newVal3 = Interestingness();
-            result.Add(newVal3);
-
-            binMax -= incr * 2;
-            var newVal4 = Interestingness();
-            result.Add(newVal4);
-
-            binMax += incr;
-
-            return result;
-        }
 
         private int totalCount = 0;
         private Dictionary<string, int> labelCount;
@@ -118,7 +89,7 @@ namespace Workbench2 {
                 if (this.firstVal != val) {
                     this.binMin = Math.Min(this.firstVal.Value, val) - .1;
                     this.binMax = Math.Max(this.firstVal.Value, val) + .1;
-                    Debug.Print(string.Format("Min: {0}, max: {1}", this.binMin, this.binMax));
+                    //Debug.Print(string.Format("Min: {0}, max: {1}", this.binMin, this.binMax));
                 } else {
                     return null;
                 }
@@ -133,17 +104,27 @@ namespace Workbench2 {
             var probPerLabel = this.ProbabilityPerLabel();
             ///Probability that eval == true regardless of label
             var apriori = this.APrioriProbability();
-            
+            double bestProb = double.MinValue;
+            string bestGuess = "";
+            double totalResultSum = 0;
             foreach (var l in probPerLabel.Keys) {
                 var aprioriLabelProb = this.labelCount[l] / (double)this.totalCount;
                 var probVal = (probPerLabel[l] * aprioriLabelProb) / apriori;
+                double thisResult;
                 if (eval) {
-                    result[l] = probVal;
+                    thisResult = probVal;
                 } else {
-                    result[l] = 1 - probVal;
+                    thisResult = 1 - probVal;
                 }
+                result[l] = thisResult;
+                if (thisResult > bestProb) {
+                    bestProb = thisResult;
+                    bestGuess = l;
+                }
+                totalResultSum += thisResult;
                 //Debug.Print(string.Format("resolved probability. Label: {0}, val: {1}", l, probVal));
             }
+            
 
             if (!this.hitsPerLabel.ContainsKey(label)) {
                 this.hitsPerLabel[label] = 0;
@@ -162,11 +143,26 @@ namespace Workbench2 {
                 this.labelCount[label]++;
             }
             this.totalCount++;
-
-            if (apriori == 1) {
+            if (apriori == 1 || result.Count == 0) {
                 return null;
             }
+
+            //if (totalResultSum != 1) {
+            //    foreach (var r in result.ToList()) {
+            //        result[r.Key] = r.Value / totalResultSum;
+            //    }
+            //}
+            //this.success.Trial(label, result, bestGuess);
+
+            //var n = result.Count - 1;
+            //foreach (var r in result.ToList()) {
+            //    result[r.Key] =  Math.Log((r.Value * n) / (1 - r.Value));
+            //}
+
             return result;
         }
+
+        private FeatureSuccess success;
+
     }
 }

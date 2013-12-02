@@ -26,7 +26,7 @@ namespace Workbench2 {
 
             this.loader = new InputLoader();
             this.loader.LoadFile(@"C:\Users\Amichai\Data\digits.csv");
-            this.allfeatures = new AllFeatures(28,28);
+            this.allfeatures = new AllFeatures(10000, 28);
             this.success = new FeatureSuccess();
             this.Process(this.loader.AllElements());
         }
@@ -43,6 +43,7 @@ namespace Workbench2 {
                     this.success.Trial(a.Item2, result, guess);
                     Debug.Print(string.Format("{0}: success: {1}", counter++, this.success.Overall.LastN()));
                 }
+                //this.allfeatures.AddFeature(28);
                 ///Generate new and purge old features
             }
         }

@@ -7,15 +7,21 @@ using Workbench2.Generators;
 
 namespace Workbench2 {
     class AllFeatures {
-        public AllFeatures(int width, int height) {
+        public AllFeatures(int featureCount, int max) {
             this.features = new List<SingleFeature>();
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    this.features.Add(new SingleFeature(
-                    new PixelValGenerator(i, j)));
-                }
+            for (int i = 0; i < featureCount; i++) {
+                this.features.Add(new SingleFeature(
+                    //new PixelValGenerator(i, j)));
+            new PixelDiffGenerator(rand.Next(max), rand.Next(max), rand.Next(max), rand.Next(max))));
             }
         }
+        private static Random rand = new Random();
+
+        public void AddFeature(int max) {
+            this.features.Add(new SingleFeature(
+                new PixelDiffGenerator(rand.Next(max), rand.Next(max), rand.Next(max), rand.Next(max))));
+        }
+
         List<SingleFeature> features;
         internal Dictionary<string, double> TestTrain(int[][] p, string label, out string guess) {
             Dictionary<string, double> totalResult = new Dictionary<string, double>();
@@ -24,6 +30,7 @@ namespace Workbench2 {
                 if (result == null) {
                     continue;
                 }
+
                 this.Add(result, totalResult);
             }
             guess = "";

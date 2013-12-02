@@ -53,6 +53,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Generators\PixelDiffGenerator.cs" />
     <Compile Include="Generators\PixelValGenerator.cs" />
     <Compile Include="GradientAscent.cs" />
     <Compile Include="IValGenerator.cs" />
