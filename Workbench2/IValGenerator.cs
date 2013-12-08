@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Workbench2 {
-    interface IValGenerator {
+    public interface IValGenerator {
         Func<int[][], double> Generator { get; set; }
         double Eval(int[][] i);
     }

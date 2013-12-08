@@ -22,7 +22,7 @@ namespace Workbench2 {
     public partial class MainWindow : Window {
         public MainWindow() {
             InitializeComponent();
-            new Processor();
+            //new Processor();
             
         }
 

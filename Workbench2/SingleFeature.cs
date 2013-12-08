@@ -7,7 +7,7 @@ using PRCommon;
 using System.Diagnostics;
 
 namespace Workbench2 {
-    class SingleFeature {
+    public class SingleFeature {
         public SingleFeature(IValGenerator generator) {
             //this.pastVals = new List<Tuple<double, string>>();
             this.labelCount = new Dictionary<string, int>();

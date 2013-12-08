@@ -7,19 +7,26 @@ using Workbench2.Generators;
 
 namespace Workbench2 {
     class AllFeatures {
-        public AllFeatures(int featureCount, int max) {
+        public AllFeatures(int featureCount, int max, Func<SingleFeature> generator) {
+            this.GenerateFeature = generator;
             this.features = new List<SingleFeature>();
             for (int i = 0; i < featureCount; i++) {
-                this.features.Add(new SingleFeature(
+                //this.features.Add(new SingleFeature(
                     //new PixelValGenerator(i, j)));
-            new PixelDiffGenerator(rand.Next(max), rand.Next(max), rand.Next(max), rand.Next(max))));
+            //new PixelQuotGenerator(rand.Next(max), rand.Next(max), rand.Next(max), rand.Next(max))));
+
+                this.features.Add(GenerateFeature());
             }
         }
         private static Random rand = new Random();
 
+        public Func<SingleFeature> GenerateFeature { get; set; }
+
         public void AddFeature(int max) {
-            this.features.Add(new SingleFeature(
-                new PixelDiffGenerator(rand.Next(max), rand.Next(max), rand.Next(max), rand.Next(max))));
+            //this.features.Add(new SingleFeature(
+            //    new PixelQuotGenerator(rand.Next(max), rand.Next(max), rand.Next(max), rand.Next(max))));
+            this.features.Add(GenerateFeature());
+
         }
 
         List<SingleFeature> features;
