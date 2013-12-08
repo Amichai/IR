@@ -20,32 +20,12 @@ namespace Workbench2 {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-        InputLoader loader;
         public MainWindow() {
             InitializeComponent();
-
-            this.loader = new InputLoader();
-            this.loader.LoadFile(@"C:\Users\Amichai\Data\digits.csv");
-            this.allfeatures = new AllFeatures(10000, 28);
-            this.success = new FeatureSuccess();
-            this.Process(this.loader.AllElements());
+            new Processor();
+            
         }
 
-        private AllFeatures allfeatures;
-        private FeatureSuccess success;
 
-        public void Process(IEnumerable<Tuple<int[][], string>> dataStream) {
-            int counter = 0;
-            foreach (var a in dataStream) {
-                string guess;
-                Dictionary<string, double> result = this.allfeatures.TestTrain(a.Item1, a.Item2, out guess);
-                if (guess != "") {
-                    this.success.Trial(a.Item2, result, guess);
-                    Debug.Print(string.Format("{0}: success: {1}", counter++, this.success.Overall.LastN()));
-                }
-                //this.allfeatures.AddFeature(28);
-                ///Generate new and purge old features
-            }
-        }
     }
 }

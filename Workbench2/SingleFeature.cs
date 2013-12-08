@@ -121,7 +121,7 @@ namespace Workbench2 {
                     bestProb = thisResult;
                     bestGuess = l;
                 }
-                totalResultSum += thisResult;
+                totalResultSum += Math.Pow(thisResult, .5);
                 //Debug.Print(string.Format("resolved probability. Label: {0}, val: {1}", l, probVal));
             }
             
@@ -147,11 +147,7 @@ namespace Workbench2 {
                 return null;
             }
 
-            //if (totalResultSum != 1) {
-            //    foreach (var r in result.ToList()) {
-            //        result[r.Key] = r.Value / totalResultSum;
-            //    }
-            //}
+            //normalize(result, totalResultSum);
             //this.success.Trial(label, result, bestGuess);
 
             //var n = result.Count - 1;
@@ -160,6 +156,14 @@ namespace Workbench2 {
             //}
 
             return result;
+        }
+
+        private static void normalize(Dictionary<string, double> result, double totalResultSum) {
+            if (totalResultSum != 1) {
+                foreach (var r in result.ToList()) {
+                    result[r.Key] = r.Value / totalResultSum;
+                }
+            }
         }
 
         private FeatureSuccess success;

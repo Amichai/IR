@@ -58,6 +58,7 @@
     <Compile Include="GradientAscent.cs" />
     <Compile Include="IValGenerator.cs" />
     <Compile Include="ProbabilityCounter.cs" />
+    <Compile Include="Processor.cs" />
     <Compile Include="SingleFeature.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
