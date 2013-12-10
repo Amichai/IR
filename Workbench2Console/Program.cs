@@ -25,19 +25,20 @@ namespace Workbench2Console {
 
             //var p1 = new Workbench2.Processor("p1");
             var p1 = new Workbench2.Processor(g1, "pixelpixelProd");
-            var p2 = new Workbench2.Processor(g2, "pixelDiff");
+            //var p2 = new Workbench2.Processor(g2, "pixelDiff");
 
             ////p1.accumulator = (Action<Dictionary<string, double>, Dictionary<string, double>>)((a, b) => Add(a, b));
             //p1.accumulator = (a, b) => Add(a, b, 1);
             p1.accumulator = (a, b) => Add(a, b, 4);
-            p2.accumulator = (a, b) => Add(a, b, 4);
+            //p2.accumulator = (a, b) => Add(a, b, 4);
 
             //p3.accumulator = (a, b) => Add(a, b, 3);
 
 
             //Parallel.Invoke(
             //Parallel.Invoke((Action)(() => p2.Run()), p1.Run, p3.Run);
-            Parallel.Invoke(p1.Run, p2.Run);
+            //Parallel.Invoke(p1.Run, p2.Run);
+            p1.Run();
 
         }
         private static Random rand = new Random();

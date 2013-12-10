@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Workbench2.Generators;
 
 namespace Workbench2 {
@@ -79,6 +80,14 @@ namespace Workbench2 {
             get {
                 return this.features.Count();
             }
+        }
+
+        internal XElement ToXml() {
+            XElement root = new XElement("AllFeatures");
+            foreach (var f in features) {
+                root.Add(f.ToXml());
+            }
+            return root;
         }
     }
 }

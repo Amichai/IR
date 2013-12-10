@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using PRCommon;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Workbench2 {
     public class SingleFeature {
@@ -168,5 +169,18 @@ namespace Workbench2 {
 
         private FeatureSuccess success;
 
+        internal XElement ToXml() {
+            XElement root = new XElement("Feature");
+            root.Add(new XElement("Success", this.success.ToXml()));
+            root.Add(new XAttribute("Interestingness", this.Interestingness()));
+            if (this.binMin != null) {
+                root.Add(new XAttribute("BinMin", this.binMin.Value));
+            }
+            if (this.binMax != null) {
+                root.Add(new XAttribute("BinMax", this.binMax.Value));
+            }
+            root.Add(new XElement("Generator", this.valGenerator.ToXml()));
+            return root;
+        }
     }
 }
