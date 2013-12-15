@@ -68,24 +68,24 @@ namespace Workbench2 {
                             bestSuccess = overall;
                         }
                         if (counter++ % 10 == 0) {
-                            //string line1 = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
-                            //    processID.ToString(), counter, 
-                            //    string.Format("{0:N2}", overall), 
-                            //    string.Format("{0:N2}", Math.Round(bestSuccess, 2)), 
-                            //    this.allfeatures.Count,
-                            //    string.Format("{0:N2}", Math.Round(this.success.Overall.RunningGeometric, 2)),
-                            //    string.Format("{0:N2}", Math.Round(this.success.Overall.RunningExponential, 2)), 
-                            //    this.Name);
+                            string line1 = string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+                                processID.ToString(), counter,
+                                string.Format("{0:N2}", overall),
+                                string.Format("{0:N2}", Math.Round(bestSuccess, 2)),
+                                this.allfeatures.Count,
+                                string.Format("{0:N2}", Math.Round(this.success.Overall.RunningGeometric, 2)),
+                                string.Format("{0:N2}", Math.Round(this.success.Overall.RunningExponential, 2)),
+                                this.Name);
 
-                            string line1 = this.ToXml().ToString();
+                            //string line1 = this.ToXml().ToString();
                             //Console.WriteLine();
                             //Console.WriteLine();
                             outfile.WriteLine(line1);
                             outfile.FlushAsync();
-                            Console.WriteLine(counter.ToString());
+                            Console.WriteLine(line1);
                         }
                     }
-                    this.allfeatures.AddFeature(28);
+                    //this.allfeatures.AddFeature(28);
                     ///Generate new and purge old features
                 }
             }

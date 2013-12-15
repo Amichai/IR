@@ -34,7 +34,9 @@ namespace Workbench2 {
         internal Dictionary<string, double> TestTrain(int[][] p, string label, Action<Dictionary<string, double>, Dictionary<string, double>> accumulator,
             out string guess) {
             Dictionary<string, double> totalResult = new Dictionary<string, double>();
+            int featureCount = 0;
             foreach (var f in features) {
+                featureCount++;
                 Dictionary<string, double> result = f.TestTrain(p, label);
                 if (result == null) {
                     continue;
@@ -43,6 +45,17 @@ namespace Workbench2 {
                 //accumulator(result, totalResult);
                 //this.Add(result, totalResult);
                 accumulator(result, totalResult);
+
+                if (totalResult.Count(i => i.Value == 0) == 9) {
+                    Console.WriteLine(string.Format("{0} / {1} features seen. Number at Zero: 9",
+                        featureCount, features.Count));
+                    break;
+                }
+                if (totalResult.Any(i => double.IsInfinity(i.Value))) {
+                    Console.WriteLine(string.Format("{0} / {1} features seen. Number at infinity: {2}", 
+                        featureCount, features.Count, totalResult.Count(i => double.IsInfinity(i.Value))));
+                    break;
+                }
                 //this.Mult(result, totalResult);
             }
             guess = "";

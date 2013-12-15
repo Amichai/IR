@@ -39,6 +39,10 @@ namespace Workbench2 {
         public Dictionary<string, double> ProbabilityPerLabel() {
             Dictionary<string, double> hitCount = new Dictionary<string, double>();
             foreach (var h in hitsPerLabel) {
+                //double pb_a = h.Value / (double)labelCount[h.Key];
+                //double pa = (double)labelCount[h.Key] * totalCount;
+                //double pb = totalHits / (double)totalCount;
+                //hitCount[h.Key] = pb_a * pa / pb;
                 hitCount[h.Key] = h.Value / (double)labelCount[h.Key];
             }
             return hitCount;
@@ -109,7 +113,8 @@ namespace Workbench2 {
             string bestGuess = "";
             double totalResultSum = 0;
             foreach (var l in probPerLabel.Keys) {
-                var aprioriLabelProb = this.labelCount[l] / (double)this.totalCount;
+                //var aprioriLabelProb = this.labelCount[l] / (double)this.totalCount;
+                var aprioriLabelProb = .1;
                 var probVal = (probPerLabel[l] * aprioriLabelProb) / apriori;
                 double thisResult;
                 if (eval) {
@@ -123,6 +128,7 @@ namespace Workbench2 {
                     bestGuess = l;
                 }
                 totalResultSum += Math.Pow(thisResult, .5);
+                //totalResultSum += thisResult;
                 //Debug.Print(string.Format("resolved probability. Label: {0}, val: {1}", l, probVal));
             }
             
